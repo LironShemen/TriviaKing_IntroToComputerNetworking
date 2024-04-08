@@ -29,6 +29,7 @@ class TriviaGameClient:
         udp_socket.bind(('localhost', 13117))
         return udp_socket
 
+
     #Listens for offer requests from the server. It uses select to check if there is any
     # data available to read on the UDP socket. If an offer is received, it calls handle_offer method.
     def listen_for_offers(self, udp_socket):
