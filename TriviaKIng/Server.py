@@ -103,13 +103,25 @@ class FoodTriviaServer:
         self.udp_thread.start()
 
     def send_offer_message(self):
-        while not self.Game_Started:
-            udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-            udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            udp_to_bits = 13117
-            offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
-            udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
+        # while not self.Game_Started:
+        #     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        #     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        #     udp_to_bits = 13117
+        #     offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
+        #     udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
             #udp_socket.close()
+        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        while not self.Game_Started:
+            try:
+                udp_to_bits = 13117
+                offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
+                udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
+                time.sleep(1)  # Adjust as needed to control the rate of message sending
+            except Exception as e:
+                print("Error sending UDP offer message:", e)
+                # Handle the error condition appropriately
+        udp_socket.close()
 
     def handle_tcp_client(self, client_socket):
         global GAME_OVER, connected_clients
