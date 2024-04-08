@@ -115,7 +115,8 @@ class FoodTriviaServer:
         while not self.Game_Started:
             try:
                 udp_to_bits = 13117
-                offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
+                servernameencode = self.SERVER_NAME
+                offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
                 udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
                 time.sleep(1)  # Adjust as needed to control the rate of message sending
             except Exception as e:
