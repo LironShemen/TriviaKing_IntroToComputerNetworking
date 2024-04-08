@@ -68,16 +68,13 @@ class FoodTriviaServer:
         self.GAME_OVER = False
 
 
-
-
-
     def start(self):
         global TCP_PORT
         self.udp_thread.start()
         #open tcp socket
         self.tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.TCP_PORT = find_available_port(self.TCP_PORT)
-        self.tcp_socket.bind(('0.0.0.0', self.TCP_PORT))
+        self.tcp_socket.bind(('', self.TCP_PORT))
         self.tcp_socket.listen(5)
         print("Server started, listening on IP address 172.1.0.4")
         timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
