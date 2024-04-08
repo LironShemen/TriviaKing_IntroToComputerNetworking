@@ -106,7 +106,8 @@ class FoodTriviaServer:
         while not self.Game_Started:
             udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + self.UDP_PORT.to_bytes(2, 'big')
+            udp_to_bits = 13117
+            offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
             udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
             udp_socket.close()
 
