@@ -9,7 +9,7 @@ import select
 # Global variables
 MAGIC_COOKIE = b'\xab\xcd\xdc\xba'
 SERVER_NAME = "SapirAndLironMagicFoodieServer#1"
-UDP_PORT = 5555
+UDP_PORT = 13117
 QUESTION_TIMEOUT = 10  # seconds
 GAME_QUESTION_COUNT = 20
 GAME_OVER = False
@@ -109,7 +109,7 @@ class FoodTriviaServer:
             udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             offer_message = MAGIC_COOKIE + b'\x02' + SERVER_NAME.encode().ljust(32) + UDP_PORT.to_bytes(2, 'big')
-            udp_socket.sendto(offer_message, ('172.1.0.4', 13117))
+            udp_socket.sendto(offer_message, ('172.1.0.4', UDP_PORT))
             udp_socket.close()
 
     def handle_tcp_client(self, client_socket):
