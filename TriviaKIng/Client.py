@@ -26,7 +26,7 @@ class TriviaGameClient:
         # Set SO_REUSEPORT option if available
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        udp_socket.bind(('localhost', 13117))
+        udp_socket.bind(('0.0.0.0', 13117))
         return udp_socket
 
 
