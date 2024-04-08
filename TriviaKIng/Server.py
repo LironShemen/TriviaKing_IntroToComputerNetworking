@@ -114,10 +114,10 @@ class FoodTriviaServer:
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         while not self.Game_Started:
             try:
-                udp_to_bits = 13117
+                udp_to_bits = 12345
                 servernameencode = self.SERVER_NAME
                 offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
-                udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
+                udp_socket.sendto(offer_message, ('<broadcast>', self.UDP_PORT))
                 time.sleep(1)  # Adjust as needed to control the rate of message sending
             except Exception as e:
                 print("Error sending UDP offer message:", e)

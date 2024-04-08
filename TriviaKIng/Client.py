@@ -12,7 +12,7 @@ class TriviaGameClient:
         self.tcp_socket = None
         self.state = "looking_for_server"
         self.buffer_size = 1024
-        self.server_port = 0
+        self.server_port = 13117
 
     #Starts the client by setting up a UDP socket and listening for offers from the server.
     def start(self):
@@ -26,7 +26,8 @@ class TriviaGameClient:
         # Set SO_REUSEPORT option if available
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        udp_socket.bind(('', 13117))
+        udp_socket.bind(('0.0.0.0', 13117))
+        data, adress = udp_socket.recvfrom(self.buffer_size)
         return udp_socket
 
 
@@ -35,20 +36,34 @@ class TriviaGameClient:
     def listen_for_offers(self, udp_socket):
         print("Client started, listening for offer requests...")
 
-        while True:
-            ready_sockets, _, _ = select.select([udp_socket], [], [], 1)
+        data, addr = udp_socket.recvfrom(self.buffer_size)
+        # message = data.decode('utf-8')
+        # self.handle_offer(message[4:36].strip(), addr[0])
 
-            if udp_socket in ready_sockets:
-                data, addr = udp_socket.recvfrom(self.buffer_size)
-                message = data.decode('utf-8')
-                self.server_port = addr[1]
-                self.handle_offer(message[4:36].strip(), addr[0])
 
-            if self.state == "connecting_to_server":
-                self.connect_to_server()
+        self.server_port = addr[1]
+        self.handle_offer(data[5:37].strip(), addr[0])
 
-            if self.state == "game_mode":
-                self.game_mode()
+        if self.state == "connecting_to_server":
+            self.connect_to_server()
+
+        if self.state == "game_mode":
+            self.game_mode()
+
+        # while True:
+        #     ready_sockets, _, _ = select.select([udp_socket], [], [], 1)
+        #
+        #     if udp_socket in ready_sockets:
+        #         data, addr = udp_socket.recvfrom(self.buffer_size)
+        #         message = data.decode('utf-8')
+        #         self.server_port = addr[1]
+        #         self.handle_offer(message[4:36].strip(), addr[0])
+        #
+        #     if self.state == "connecting_to_server":
+        #         self.connect_to_server()
+        #
+        #     if self.state == "game_mode":
+        #         self.game_mode()
         # while True:
             # try:
             #     data, addr = udp_socket.recvfrom(self.buffer_size)
