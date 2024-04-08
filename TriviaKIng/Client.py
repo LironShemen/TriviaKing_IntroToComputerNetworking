@@ -1,6 +1,7 @@
 import socket
 import sys
 import select
+import Server
 
 class TriviaGameClient:
     #Initializes the client with a player name, server address,
@@ -11,6 +12,7 @@ class TriviaGameClient:
         self.tcp_socket = None
         self.state = "looking_for_server"
         self.buffer_size = 1024
+        self.server_port = 0
 
     #Starts the client by setting up a UDP socket and listening for offers from the server.
     def start(self):
@@ -19,11 +21,12 @@ class TriviaGameClient:
 
     #Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
     def setup_udp_socket(self):
+        port = Server.find_available_port(12345)
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Set SO_REUSEPORT option if available
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        udp_socket.bind(('localhost', 12345))
+        udp_socket.bind(('localhost', port))
         return udp_socket
 
     #Listens for offer requests from the server. It uses select to check if there is any
@@ -37,6 +40,7 @@ class TriviaGameClient:
             if udp_socket in ready_sockets:
                 data, addr = udp_socket.recvfrom(self.buffer_size)
                 message = data.decode('utf-8')
+                self.server_port = addr[1]
                 self.handle_offer(message, addr[0])
 
             if self.state == "connecting_to_server":
@@ -47,24 +51,24 @@ class TriviaGameClient:
 
     #Handles the offer received from the server. It sets the server address and changes
     # the state to "connecting_to_server".
-    def handle_offer(self, message, server_address):
+    def handle_offer(self, server_name, server_address):
         self.state = "connecting_to_server"
         self.server_address = server_address
-        print(f"Received offer from server {message} at address {server_address}, attempting to connect...")
+        print(f"Received offer from server {server_name} at address {server_address}, attempting to connect...")
 
     #Tries to connect to the server using TCP socket. If successful, it sends
     # the player name to the server and changes the state to "game_mode".
     def connect_to_server(self):
         try:
             self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.tcp_socket.connect((self.server_address, 12346))
+            self.tcp_socket.connect((self.server_address, self.server_port))
             self.tcp_socket.sendall((self.player_name + '\n').encode('utf-8'))
             self.state = "game_mode"
         except Exception as e:
             print(f"Failed to connect to server: {e}")
             self.state = "looking_for_server"
 
-    #Enters the game mode where it waits for inputs from the server or user.
+    # Enters the game mode where it waits for inputs from the server or user.
     # It uses select to wait for data on the TCP socket or user input from stdin.
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
