@@ -7,12 +7,7 @@ import random
 import select
 
 # Global variables
-MAGIC_COOKIE = b'\xab\xcd\xdc\xba'
-SERVER_NAME = "SapirAndLironMagicFoodieServer#1"
-UDP_PORT = 13117
-QUESTION_TIMEOUT = 10  # seconds
-GAME_QUESTION_COUNT = 20
-GAME_OVER = False
+
 
 # Trivia questions about food
 TRIVIA_QUESTIONS = {
@@ -65,6 +60,12 @@ class FoodTriviaServer:
         self.is_player_answer_right = False
         self.TCP_PORT = 5556
         self.temp_socket_list = []
+        self.MAGIC_COOKIE = b'\xab\xcd\xdc\xba'
+        self.SERVER_NAME = "SapirAndLironMagicFoodieServer#1"
+        self.UDP_PORT = 13117
+        self.QUESTION_TIMEOUT = 10  # seconds
+        self.GAME_QUESTION_COUNT = 20
+        self.GAME_OVER = False
 
 
 
@@ -108,8 +109,8 @@ class FoodTriviaServer:
         while not self.Game_Started:
             udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            offer_message = MAGIC_COOKIE + b'\x02' + SERVER_NAME.encode().ljust(32) + UDP_PORT.to_bytes(2, 'big')
-            udp_socket.sendto(offer_message, ('172.1.0.4', UDP_PORT))
+            offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + self.UDP_PORT.to_bytes(2, 'big')
+            udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
             udp_socket.close()
 
     def handle_tcp_client(self, client_socket):
