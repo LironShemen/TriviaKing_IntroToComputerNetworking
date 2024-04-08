@@ -83,7 +83,7 @@ class FoodTriviaServer:
                 client_socket, address = self.tcp_socket.accept()
                 connected_clients_sockets.append(client_socket)
                 timer_10sec_no_client.start()
-                #print(f"New connection from {address}")
+                print(f"New connection from {address}")
                 client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
                 self.clients_threads.append(client_thread)
                 client_thread.start()
@@ -109,13 +109,13 @@ class FoodTriviaServer:
             udp_to_bits = 13117
             offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
             udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
-            udp_socket.close()
+            #udp_socket.close()
 
     def handle_tcp_client(self, client_socket):
         global GAME_OVER, connected_clients
         # Receive player name from client
         player_name = client_socket.recv(1024).decode().strip()
-        #print(f"Player connected: {player_name}")
+        print(f"Player connected: {player_name}")
         connected_clients.append(player_name)
         playerName_with_his_socket[client_socket] = player_name
         self.check_winner_dictionary[player_name] = [None,0]
