@@ -98,8 +98,8 @@ class FoodTriviaServer:
         self.tcp_socket.close()
         print("Game over, sending out offer requests...")
         self.udp_thread.join()
-        global UDP_PORT
-        UDP_PORT += 1
+        # global UDP_PORT
+        # UDP_PORT += 1
         self.udp_thread = threading.Thread(target=self.send_offer_message)
         self.udp_thread.daemon = True
         self.udp_thread.start()

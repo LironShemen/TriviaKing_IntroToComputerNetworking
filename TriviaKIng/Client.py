@@ -42,7 +42,7 @@ class TriviaGameClient:
                 data, addr = udp_socket.recvfrom(self.buffer_size)
                 message = data.decode('utf-8')
                 self.server_port = addr[1]
-                self.handle_offer(message, addr[0])
+                self.handle_offer(message[4:36].strip(), addr[0])
 
             if self.state == "connecting_to_server":
                 self.connect_to_server()
