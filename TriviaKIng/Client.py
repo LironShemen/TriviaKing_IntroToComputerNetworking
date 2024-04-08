@@ -21,12 +21,12 @@ class TriviaGameClient:
 
     #Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
     def setup_udp_socket(self):
-        port = Server.find_available_port(12345)
+        # port = Server.find_available_port(12345)
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # Set SO_REUSEPORT option if available
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        udp_socket.bind(('localhost', port))
+        udp_socket.bind(('localhost', 13117))
         return udp_socket
 
     #Listens for offer requests from the server. It uses select to check if there is any
