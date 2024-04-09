@@ -70,11 +70,11 @@ class FoodTriviaServer:
 
     def start(self):
         global TCP_PORT
+        self.MY_IP = get_my_ip()
         self.udp_thread.start()
         #open tcp socket
         self.tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.TCP_PORT = find_available_port(self.TCP_PORT)
-        self.MY_IP = get_my_ip()
         self.tcp_socket.bind((self.MY_IP, self.TCP_PORT))
         self.tcp_socket.listen()
         print("Server started, listening on IP address "+ f'{self.MY_IP}')
@@ -83,17 +83,19 @@ class FoodTriviaServer:
             try:
                 client_socket, address = self.tcp_socket.accept()
                 connected_clients_sockets.append(client_socket)
+                timer_10sec_no_client.cancel()
                 timer_10sec_no_client.start()
                 print(f"New connection from {address}")
                 client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
                 self.clients_threads.append(client_thread)
                 client_thread.start()
-            except TimeoutError:
+            except TimeoutError as e:
+                print(e)
                 if(len(connected_clients)>1):
                     self.Game_Started = True
                     self.run_game()
+                    pass
                 #print("Server manually stopped.")
-                break
         self.tcp_socket.close()
         print("Game over, sending out offer requests...")
         self.udp_thread.join()
@@ -106,6 +108,7 @@ class FoodTriviaServer:
     def send_offer_message(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        udp_socket.bind((f"{self.MY_IP}", self.UDP_PORT))
         tcp_to_bits = self.TCP_PORT
         servernameencode = self.SERVER_NAME
         offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + tcp_to_bits.to_bytes(2,                                                                                                        'big')
@@ -122,7 +125,7 @@ class FoodTriviaServer:
         global GAME_OVER, connected_clients
         # Receive player name from client
         player_name = client_socket.recv(1024).decode().strip()
-        print(f"Player connected: {player_name}")
+        #print(f"Player connected: {player_name}")
         connected_clients.append(player_name)
         playerName_with_his_socket[client_socket] = player_name
         self.check_winner_dictionary[player_name] = [None,0]
