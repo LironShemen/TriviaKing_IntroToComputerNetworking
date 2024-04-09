@@ -149,8 +149,8 @@ class FoodTriviaServer:
             sendallclients(question+"\n", connected_clients_sockets)
 
             self.temp_socket_list = connected_clients_sockets
-            timer = threading.Timer(10,self.time_out_handler_in_game)
-            timer.start()
+            # timer = threading.Timer(10,self.time_out_handler_in_game)
+            # timer.start()
             threads = []
 
             for s in connected_clients_sockets:
@@ -162,7 +162,7 @@ class FoodTriviaServer:
             #     t.join()
             time.sleep(10)
 
-            timer.cancel()
+            # timer.cancel()
 
 
 
@@ -187,7 +187,13 @@ class FoodTriviaServer:
         global connected_clients_sockets
         start_time = time.time()
         player = playerName_with_his_socket[client_socket]
-        answer = self.receive_answer(client_socket,start_time)
+        client_socket.settimeout(10)
+        try:
+            answer = self.receive_answer(client_socket,start_time)
+        except socket.timeout:
+            answer = None
+            pass
+
         self.check_winner_dictionary[player] = [answer,time.time() - start_time]
         if answer in correct_answer and client_socket in self.temp_socket_list:
             lock.acquire()
