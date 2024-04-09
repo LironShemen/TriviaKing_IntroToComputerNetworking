@@ -37,9 +37,6 @@ class TriviaGameClient:
         print("Client started, listening for offer requests...")
 
         data, addr = udp_socket.recvfrom(self.buffer_size)
-        # message = data.decode('utf-8')
-        # self.handle_offer(message[4:36].strip(), addr[0])
-
 
         self.server_port = addr[1]
         self.handle_offer(data[5:37].strip(), addr[0])
@@ -49,38 +46,6 @@ class TriviaGameClient:
 
         if self.state == "game_mode":
             self.game_mode()
-
-        # while True:
-        #     ready_sockets, _, _ = select.select([udp_socket], [], [], 1)
-        #
-        #     if udp_socket in ready_sockets:
-        #         data, addr = udp_socket.recvfrom(self.buffer_size)
-        #         message = data.decode('utf-8')
-        #         self.server_port = addr[1]
-        #         self.handle_offer(message[4:36].strip(), addr[0])
-        #
-        #     if self.state == "connecting_to_server":
-        #         self.connect_to_server()
-        #
-        #     if self.state == "game_mode":
-        #         self.game_mode()
-        # while True:
-            # try:
-            #     data, addr = udp_socket.recvfrom(self.buffer_size)
-            #     message = data.decode('utf-8')
-            #     server_name = message[4:36].strip()  # Extract server name
-            #     self.server_port = int.from_bytes(data[36:38], 'big')  # Extract server port
-            #     self.handle_offer(server_name, addr[0])
-            #
-            #     if self.state == "connecting_to_server":
-            #         self.connect_to_server()
-            #
-            #     if self.state == "game_mode":
-            #         self.game_mode()
-            #
-            # except socket.timeout:
-            #     print("No more offer requests received. Exiting...")
-            #     break
 
     #Handles the offer received from the server. It sets the server address and changes
     # the state to "connecting_to_server".
