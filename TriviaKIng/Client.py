@@ -40,7 +40,6 @@ class TriviaGameClient:
         tcp_port_bytes = data[37:]
         tcp_port = int.from_bytes(tcp_port_bytes, 'big')
         self.server_port = tcp_port
-        print(self.server_port)
         self.handle_offer(data[5:37].strip(), addr[0])
 
         if self.state == "connecting_to_server":
@@ -61,7 +60,7 @@ class TriviaGameClient:
     def connect_to_server(self):
         try:
             self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.tcp_socket.connect((self.server_address, self.server_port))
+            self.tcp_socket.connect(('192.168.230.20', self.server_port))
             self.tcp_socket.sendall((self.player_name + '\n').encode('utf-8'))
             self.state = "game_mode"
         except Exception as e:

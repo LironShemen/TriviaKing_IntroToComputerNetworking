@@ -77,7 +77,7 @@ class FoodTriviaServer:
         self.MY_IP = get_my_ip()
         self.tcp_socket.bind((self.MY_IP, self.TCP_PORT))
         self.tcp_socket.listen()
-        print("Server started, listening on IP address 172.1.0.4")
+        print("Server started, listening on IP address "+ f'{self.MY_IP}')
         timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
         while True:
             try:
