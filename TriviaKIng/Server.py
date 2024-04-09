@@ -133,7 +133,7 @@ class FoodTriviaServer:
 
     def run_game(self):
         self.winner = None
-        global connected_clients, connected_clients_sockets
+        global connected_clients, connected_clients_sockets, playerName_with_his_socket
         # Choose random trivia question
         welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
         print(welcome)
@@ -177,6 +177,7 @@ class FoodTriviaServer:
                         answer = client_socket.recv(1024).decode().strip()
                         if answer in TRIVIA_QUESTIONS[question]:
                             print(answer)
+                            print(len(playerName_with_his_socket))
                             self.winner = playerName_with_his_socket[client_socket]
                             break
                     except Exception as e:
