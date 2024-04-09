@@ -45,6 +45,9 @@ connected_clients_sockets = []
 # Dictionary to take data from socket while playing, and get the name of the client with the socket
 playerName_with_his_socket = {}
 
+# locking the part of winning the game to prevent sync problems
+lock = threading.Lock()
+
 class FoodTriviaServer:
     def __init__(self):
         #thread for the broadcact
@@ -146,8 +149,8 @@ class FoodTriviaServer:
             sendallclients(question+"\n", connected_clients_sockets)
 
             self.temp_socket_list = connected_clients_sockets
-            # timer = threading.Timer(10,self.time_out_handler_in_game)
-            # timer.start()
+            timer = threading.Timer(10,self.time_out_handler_in_game)
+            timer.start()
             threads = []
 
             for s in connected_clients_sockets:
@@ -159,7 +162,7 @@ class FoodTriviaServer:
             #     t.join()
             time.sleep(10)
 
-            # timer.cancel()
+            timer.cancel()
 
 
 
@@ -187,16 +190,20 @@ class FoodTriviaServer:
         answer = self.receive_answer(client_socket,start_time)
         self.check_winner_dictionary[player] = [answer,time.time() - start_time]
         if answer in correct_answer and client_socket in self.temp_socket_list:
-            with self.GAME_OVER_Lock:
-                self.GAME_OVER = True
-            self.Game_Started = False
-            ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            print(f"{player} is correct! {player} wins!")
-            sendallclients(f"{player} is correct! {player} wins!".encode(), connected_clients_sockets)
-            print("Game over!")
-            sendallclients("Game over!".encode(), connected_clients_sockets)
-            print(f"Congratulations to the winner: {player}")
-            sendallclients(f"Congratulations to the winner: {player}".encode(), connected_clients_sockets)
+            lock.acquire()
+            try:
+                with self.GAME_OVER_Lock:
+                    self.GAME_OVER = True
+                self.Game_Started = False
+                ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                print(f"{player} is correct! {player} wins!")
+                sendallclients(f"{player} is correct! {player} wins!".encode(), connected_clients_sockets)
+                print("Game over!")
+                sendallclients("Game over!".encode(), connected_clients_sockets)
+                print(f"Congratulations to the winner: {player}")
+                sendallclients(f"Congratulations to the winner: {player}".encode(), connected_clients_sockets)
+            finally:
+                lock.release()
             ###can add game statistics
         if answer not in correct_answer:
             self.temp_socket_list.remove(client_socket)
