@@ -204,6 +204,8 @@ class FoodTriviaServer:
         while True:
             # Receive answer from client
             answer = client_socket.recv(1024).decode().strip()
+            if not answer:
+                answer = None
             return answer
 
 
