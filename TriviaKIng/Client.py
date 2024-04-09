@@ -18,6 +18,13 @@ class TriviaGameClient:
     def start(self):
         udp_socket = self.setup_udp_socket()
         self.listen_for_offers(udp_socket)
+    # def start(self):
+    #     try:
+    #         udp_socket = self.setup_udp_socket()
+    #         if udp_socket:
+    #             self.listen_for_offers(udp_socket)
+    #     except Exception as e:
+    #         print(f"Error starting client: {e}")
 
     #Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
     def setup_udp_socket(self):
@@ -26,7 +33,7 @@ class TriviaGameClient:
         # Set SO_REUSEPORT option if available
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        udp_socket.bind(('0.0.0.0', 13117))
+        udp_socket.bind(('', 13117))
         return udp_socket
 
 
@@ -60,7 +67,7 @@ class TriviaGameClient:
     def connect_to_server(self):
         try:
             self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.tcp_socket.connect(('192.168.230.20', self.server_port))
+            self.tcp_socket.connect((self.server_address, self.server_port))
             self.tcp_socket.sendall((self.player_name + '\n').encode('utf-8'))
             self.state = "game_mode"
         except Exception as e:
@@ -71,22 +78,26 @@ class TriviaGameClient:
     # It uses select to wait for data on the TCP socket or user input from stdin.
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
-        inputs = [self.tcp_socket, sys.stdin]
+        data = self.tcp_socket.recvfrom(self.buffer_size)
+        print(data)
 
-        while True:
-            readable, _, _ = select.select(inputs, [], [])
-            for sock in readable:
-                if sock == self.tcp_socket:
-                    data = sock.recv(self.buffer_size)
-                    if not data:
-                        print("Server disconnected, listening for offer requests...")
-                        self.state = "looking_for_server"
-                        return
-                    else:
-                        print(data.decode('utf-8'), end='')
-                elif sock == sys.stdin:
-                    user_input = sys.stdin.readline().strip()
-                    self.tcp_socket.sendall((user_input + '\n').encode('utf-8'))
+    # def game_mode(self):
+    #     inputs = [self.tcp_socket, sys.stdin]
+    #
+    #     while True:
+    #         readable, _, _ = select.select(inputs, [], [])
+    #         for sock in readable:
+    #             if sock == self.tcp_socket:
+    #                 data = sock.recv(self.buffer_size)
+    #                 if not data:
+    #                     print("Server disconnected, listening for offer requests...")
+    #                     self.state = "looking_for_server"
+    #                     return
+    #                 else:
+    #                     print(data.decode('utf-8'), end='')
+    #             elif sock == sys.stdin:
+    #                 user_input = sys.stdin.readline().strip()
+    #                 self.tcp_socket.sendall((user_input + '\n').encode('utf-8'))
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":

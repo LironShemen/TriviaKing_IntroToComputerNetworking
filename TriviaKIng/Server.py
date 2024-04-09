@@ -106,13 +106,13 @@ class FoodTriviaServer:
     def send_offer_message(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        tcp_to_bits = self.TCP_PORT
+        servernameencode = self.SERVER_NAME
+        offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + tcp_to_bits.to_bytes(2,                                                                                                        'big')
         while not self.Game_Started:
             try:
-                tcp_to_bits = self.TCP_PORT
-                servernameencode = self.SERVER_NAME
-                offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + tcp_to_bits.to_bytes(2, 'big')
                 udp_socket.sendto(offer_message, ('<broadcast>', self.UDP_PORT))
-                time.sleep(1)  # Adjust as needed to control the rate of message sending
+                # time.sleep(1)  # Adjust as needed to control the rate of message sending
             except Exception as e:
                 print("Error sending UDP offer message:", e)
                 # Handle the error condition appropriately
