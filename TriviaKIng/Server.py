@@ -55,7 +55,7 @@ class FoodTriviaServer:
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.udp_thread.daemon = True
         self.check_winner_dictionary = {}
-        self.Game_Started = False
+        self.Game_Started = "No"
         self.clients_threads = []
         self.is_player_answer_right = False
         self.TCP_PORT = 5556
@@ -83,7 +83,7 @@ class FoodTriviaServer:
         self.tcp_socket.listen()
         print("Server started, listening on IP address "+ f'{self.MY_IP}')
         # timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
-        while not self.Game_Started:
+        while self.Game_Started=="No":
             try:
                 client_socket, address = self.tcp_socket.accept()
                 connected_clients_sockets.append(client_socket)
@@ -97,9 +97,9 @@ class FoodTriviaServer:
                 #     print("Can't start game with only one player. Keep waiting for another player")
                     pass
                 #print("Server manually stopped.")
-        print("Game over, sending out offer requests...")
-        sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
-        self.tcp_socket.close()
+        # print("Game over, sending out offer requests...")
+        # sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+        # self.tcp_socket.close()
         self.udp_thread.join()
         self.udp_thread = threading.Thread(target=self.send_offer_message)
         self.udp_thread.daemon = True
@@ -112,7 +112,7 @@ class FoodTriviaServer:
         tcp_to_bits = self.TCP_PORT
         servernameencode = self.SERVER_NAME
         offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode('utf-8').ljust(32) + tcp_to_bits.to_bytes(2,                                                                                                        'big')
-        while not self.Game_Started:
+        while self.Game_Started=="No":
             try:
                 udp_socket.sendto(offer_message, ('<broadcast>', self.UDP_PORT))
                 # time.sleep(1)  # Adjust as needed to control the rate of message sending
@@ -189,13 +189,18 @@ class FoodTriviaServer:
                 try:
                     with self.GAME_OVER_Lock:
                         self.GAME_OVER = True
-                    self.Game_Started = False
+                    self.Game_Started = "Finish"
                     print(f"{self.winner} is correct! {self.winner} wins!")
                     sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
                     print("Game over!")
                     sendallclients("Game over!", connected_clients_sockets)
                     print(f"Congratulations to the winner: {self.winner}")
                     sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
+                    print("Game over, sending out offer requests...")
+                    sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+                    self.tcp_socket.close()
+                    self.Game_Started = "No"
+
                 finally:
                     lock.release()
 
