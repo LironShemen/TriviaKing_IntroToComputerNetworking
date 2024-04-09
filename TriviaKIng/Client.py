@@ -78,8 +78,9 @@ class TriviaGameClient:
     # It uses select to wait for data on the TCP socket or user input from stdin.
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
-        data = self.tcp_socket.recvfrom(self.buffer_size)
-        print(data)
+        while True:
+            data, _ = self.tcp_socket.recvfrom(self.buffer_size)
+            print(data.decode())
 
     # def game_mode(self):
     #     inputs = [self.tcp_socket, sys.stdin]

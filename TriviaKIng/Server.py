@@ -45,9 +45,6 @@ connected_clients_sockets = []
 # Dictionary to take data from socket while playing, and get the name of the client with the socket
 playerName_with_his_socket = {}
 
-# Helper list to disqualifies wrong player for one round
-temp_socket_list = []
-
 class FoodTriviaServer:
     def __init__(self):
         #thread for the broadcact
@@ -59,6 +56,7 @@ class FoodTriviaServer:
         self.clients_threads = []
         self.is_player_answer_right = False
         self.TCP_PORT = 5556
+        # Helper list to disqualifies wrong player for one round
         self.temp_socket_list = []
         self.MAGIC_COOKIE = b'\xab\xcd\xdc\xba'
         self.SERVER_NAME = "SapirAndLironMagicFoodieServer#1"
@@ -78,12 +76,12 @@ class FoodTriviaServer:
         self.tcp_socket.bind((self.MY_IP, self.TCP_PORT))
         self.tcp_socket.listen()
         print("Server started, listening on IP address "+ f'{self.MY_IP}')
-        timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
+        # timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
         while True:
             try:
                 client_socket, address = self.tcp_socket.accept()
                 connected_clients_sockets.append(client_socket)
-                timer_10sec_no_client.start()
+                threading.Timer(10, self.time_out_handler).start()
                 print(f"New connection from {address}")
                 client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
                 self.clients_threads.append(client_thread)
@@ -91,9 +89,6 @@ class FoodTriviaServer:
             except TimeoutError:
                 # if(len(connected_clients)==1):
                 #     print("Can't start game with only one player. Keep waiting for another player")
-                if(len(connected_clients)>1):
-                    self.Game_Started = True
-                    self.run_game()
                     pass
                 #print("Server manually stopped.")
         self.tcp_socket.close()
@@ -122,7 +117,7 @@ class FoodTriviaServer:
         udp_socket.close()
 
     def handle_tcp_client(self, client_socket):
-        global GAME_OVER, connected_clients
+        global connected_clients
         # Receive player name from client
         player_name = client_socket.recv(1024).decode().strip()
         #print(f"Player connected: {player_name}")
@@ -132,17 +127,19 @@ class FoodTriviaServer:
 
 
     def run_game(self):
-        global GAME_OVER, connected_clients
+        global connected_clients, connected_clients_sockets
         # Choose random trivia question
-        question = random.choice(TRIVIA_QUESTIONS.keys())
+        question = random.choice(list(TRIVIA_QUESTIONS.keys()))
         print("\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.")
         #SEND WELCOME TO ALL CLIENTS!!!!!!!!!!!!!!!!!!!
         for idx, player in enumerate(connected_clients, start=1):
             print(f"Player {idx}: {player}")
         print("==")
         print(question)
+        for client_socket in connected_clients_sockets:
+            client_socket.sendall(question.encode())
 
-        while not GAME_OVER:
+        while not self.GAME_OVER:
             self.temp_socket_list = connected_clients_sockets
             timer = threading.Timer(10,threading.Event().set)
             timer.start()
@@ -164,17 +161,17 @@ class FoodTriviaServer:
         if(len(connected_clients) == 1):
             print("Can't start game with only one player. Keep waiting for another player")
             #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
-        else:
-            raise TimeoutError()
-
+        elif (len(connected_clients) > 1):
+                self.Game_Started = True
+                self.run_game()
 
     def handle_client(self, client_socket, correct_answer):
         start_time = time.time()
         player = playerName_with_his_socket[client_socket]
         answer = self.receive_answer(client_socket)
         self.check_winner_dictionary[player] = [answer,time.time() - start_time]
-        if answer in correct_answer and client_socket in temp_socket_list:
-            GAME_OVER = True
+        if answer in correct_answer and client_socket in self.temp_socket_list:
+            self.GAME_OVER = True
             self.Game_Started = False
             ###########SENT TO ALL CLIENTS!!!!!!!!!!!!!!!!!!
             print(f"{player} is correct! {player} wins!")
@@ -185,7 +182,7 @@ class FoodTriviaServer:
             client_socket.sendall(f"Congratulations to the winner: {player}".encode())
             ###can add game statistics
         if answer not in correct_answer:
-            temp_socket_list.remove(client_socket)
+            self.temp_socket_list.remove(client_socket)
 
 
     def receive_answer(self, client_socket):
