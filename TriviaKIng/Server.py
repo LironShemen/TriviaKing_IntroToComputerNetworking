@@ -140,7 +140,7 @@ class FoodTriviaServer:
 
         while not self.GAME_OVER:
             question = random.choice(list(TRIVIA_QUESTIONS.keys()))
-            print("==")
+            print("\n==")
             print(question)
             sendallclients("==\n", connected_clients_sockets)
             sendallclients(question+"\n", connected_clients_sockets)
@@ -181,6 +181,7 @@ class FoodTriviaServer:
         self.Game_Started = True
 
     def handle_client(self, client_socket, correct_answer):
+        global connected_clients_sockets
         start_time = time.time()
         player = playerName_with_his_socket[client_socket]
         answer = self.receive_answer(client_socket,start_time)
@@ -190,11 +191,11 @@ class FoodTriviaServer:
             self.Game_Started = False
             ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             print(f"{player} is correct! {player} wins!")
-            client_socket.sendall(f"{player} is correct! {player} wins!".encode())
+            sendallclients(f"{player} is correct! {player} wins!".encode(), connected_clients_sockets)
             print("Game over!")
-            client_socket.sendall("Game over!".encode())
+            sendallclients("Game over!".encode(), connected_clients_sockets)
             print(f"Congratulations to the winner: {player}")
-            client_socket.sendall(f"Congratulations to the winner: {player}".encode())
+            sendallclients(f"Congratulations to the winner: {player}".encode(), connected_clients_sockets)
             ###can add game statistics
         if answer not in correct_answer:
             self.temp_socket_list.remove(client_socket)
