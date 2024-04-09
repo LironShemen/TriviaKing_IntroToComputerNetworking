@@ -142,7 +142,8 @@ class FoodTriviaServer:
             question = random.choice(list(TRIVIA_QUESTIONS.keys()))
             print("==")
             print(question)
-            sendallclients(question, connected_clients_sockets)
+            sendallclients("==\n", connected_clients_sockets)
+            sendallclients(question+"\n", connected_clients_sockets)
 
             self.temp_socket_list = connected_clients_sockets
             timer = threading.Timer(10,self.time_out_handler_in_game)
@@ -156,6 +157,7 @@ class FoodTriviaServer:
 
             # for t in threads:
             #     t.join()
+            time.sleep(10)
 
             timer.cancel()
 
