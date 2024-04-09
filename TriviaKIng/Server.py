@@ -83,14 +83,14 @@ class FoodTriviaServer:
             try:
                 client_socket, address = self.tcp_socket.accept()
                 connected_clients_sockets.append(client_socket)
-                timer_10sec_no_client.cancel()
                 timer_10sec_no_client.start()
                 print(f"New connection from {address}")
                 client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
                 self.clients_threads.append(client_thread)
                 client_thread.start()
-            except TimeoutError as e:
-                print(e)
+            except TimeoutError:
+                # if(len(connected_clients)==1):
+                #     print("Can't start game with only one player. Keep waiting for another player")
                 if(len(connected_clients)>1):
                     self.Game_Started = True
                     self.run_game()
@@ -162,7 +162,8 @@ class FoodTriviaServer:
 
     def time_out_handler(self):
         if(len(connected_clients) == 1):
-            raise TimeoutError("Can't start game with only one player. Try again later")
+            print("Can't start game with only one player. Keep waiting for another player")
+            #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
         else:
             raise TimeoutError()
 

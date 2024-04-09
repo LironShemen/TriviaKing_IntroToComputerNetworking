@@ -30,7 +30,7 @@ class TriviaGameClient:
     def setup_udp_socket(self):
         # port = Server.find_available_port(12345)
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Set SO_REUSEPORT option if available
+        #Set SO_REUSEPORT option if available
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         udp_socket.bind(('', 13117))
