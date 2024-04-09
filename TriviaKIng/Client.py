@@ -77,6 +77,7 @@ class TriviaGameClient:
             print(data.decode())
             # Get input from the user
             if data.decode().startswith("Game over, sending out offer requests..."):
+                print("Server disconnected, listening for offer requests...")
                 self.tcp_socket.close()
             if data.decode().startswith("Qusetion: "):
                 key = keyboard.read_event().name

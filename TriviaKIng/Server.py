@@ -93,12 +93,10 @@ class FoodTriviaServer:
                 #     print("Can't start game with only one player. Keep waiting for another player")
                     pass
                 #print("Server manually stopped.")
-        self.tcp_socket.close()
         print("Game over, sending out offer requests...")
         sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+        self.tcp_socket.close()
         self.udp_thread.join()
-        # global UDP_PORT
-        # UDP_PORT += 1
         self.udp_thread = threading.Thread(target=self.send_offer_message)
         self.udp_thread.daemon = True
         self.udp_thread.start()
