@@ -130,7 +130,6 @@ class FoodTriviaServer:
     def run_game(self):
         global connected_clients, connected_clients_sockets
         # Choose random trivia question
-        question = random.choice(list(TRIVIA_QUESTIONS.keys()))
         welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
         print(welcome)
         sendallclients(welcome, connected_clients_sockets)
@@ -140,6 +139,7 @@ class FoodTriviaServer:
             sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
 
         while not self.GAME_OVER:
+            question = random.choice(list(TRIVIA_QUESTIONS.keys()))
             print("==")
             print(question)
             sendallclients(question, connected_clients_sockets)
@@ -154,8 +154,8 @@ class FoodTriviaServer:
                 threads.append(client_thread)
                 client_thread.start()
 
-            for t in threads:
-                t.join()
+            # for t in threads:
+            #     t.join()
 
             timer.cancel()
 
