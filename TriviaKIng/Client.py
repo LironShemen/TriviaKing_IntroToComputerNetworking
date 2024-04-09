@@ -83,7 +83,7 @@ class TriviaGameClient:
             data, _ = self.tcp_socket.recvfrom(self.buffer_size)
             print(data.decode())
             # Get input from the user
-            if data.decode() != "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n":
+            if data.decode().startswith("Qusetion: "):
                 key = keyboard.read_event().name
                 self.tcp_socket.send(key.encode())
 

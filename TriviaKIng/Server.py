@@ -11,26 +11,26 @@ import select
 
 # Trivia questions about food
 TRIVIA_QUESTIONS = {
-    "Carrots were originally purple": ['Y', 'T', 1],
-    "Bananas are berries.": ['F', 'N', 0],
-    "Peanuts are not nuts, they are legumes.": ['Y', 'T', 1],
-    "Honey never spoils.": ['Y', 'T', 1],
-    "Eating celery burns more calories than it contains.": ['F', 'N', 0],
-    "Almonds are a member of the peach family.": ['F', 'N', 0],
-    "Avocados are poisonous to birds.": ['Y', 'T', 1],
-    "Rice contains more arsenic than other grains.": ['F', 'N', 0],
-    "Apples float in water because they are 25% air": ['Y', 'T', 1],
-    "Carrots improve night vision": ['F', 'N', 0],
-    "Spinach is a good source of iron": ['Y', 'T', 1],
-    "Chocolate causes acne": ['F', 'N', 0],
-    "Garlic can help lower blood pressure": ['Y', 'T', 1],
-    "Milk helps to create mucus": ['F', 'N', 0],
-    "Pineapple can tenderize meat because it contains bromelain": ['Y', 'T', 1],
-    "Coffee stunts your growth": ['F', 'N', 0],
-    "Eating spicy food can boost metabolism": ['Y', 'T', 1],
-    "Turkey makes you sleepy because it contains high levels of tryptophan": ['F', 'N', 0],
-    "Coconut water is sterile and can be used as an emergency IV hydration fluid": ['Y', 'T', 1],
-    "Eating cheese before bed gives you nightmares": ['F', 'N', 0]
+    "Qusetion: Carrots were originally purple": ['Y', 'T', 1],
+    "Qusetion: Bananas are berries.": ['F', 'N', 0],
+    "Qusetion: Peanuts are not nuts, they are legumes.": ['Y', 'T', 1],
+    "Qusetion: Honey never spoils.": ['Y', 'T', 1],
+    "Qusetion: Eating celery burns more calories than it contains.": ['F', 'N', 0],
+    "Qusetion: Almonds are a member of the peach family.": ['F', 'N', 0],
+    "Qusetion: Avocados are poisonous to birds.": ['Y', 'T', 1],
+    "Qusetion: Rice contains more arsenic than other grains.": ['F', 'N', 0],
+    "Qusetion: Apples float in water because they are 25% air": ['Y', 'T', 1],
+    "Qusetion: Carrots improve night vision": ['F', 'N', 0],
+    "Qusetion: Spinach is a good source of iron": ['Y', 'T', 1],
+    "Qusetion: Chocolate causes acne": ['F', 'N', 0],
+    "Qusetion: Garlic can help lower blood pressure": ['Y', 'T', 1],
+    "Qusetion: Milk helps to create mucus": ['F', 'N', 0],
+    "Qusetion: Pineapple can tenderize meat because it contains bromelain": ['Y', 'T', 1],
+    "Qusetion: Coffee stunts your growth": ['F', 'N', 0],
+    "Qusetion: Eating spicy food can boost metabolism": ['Y', 'T', 1],
+    "Qusetion: Turkey makes you sleepy because it contains high levels of tryptophan": ['F', 'N', 0],
+    "Qusetion: Coconut water is sterile and can be used as an emergency IV hydration fluid": ['Y', 'T', 1],
+    "Qusetion: Eating cheese before bed gives you nightmares": ['F', 'N', 0]
 }
 
 # Mutex for thread synchronization
