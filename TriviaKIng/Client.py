@@ -82,13 +82,14 @@ class TriviaGameClient:
             try:
                 if data.decode().startswith("Qusetion: "):
                     key = keyboard.read_event().name
-                    self.tcp_socket.send(key.encode(), self.player_name.encode())
+                    # self.tcp_socket.send(key.encode(), self.player_name.encode())
+                    self.tcp_socket.send(key.encode())
             except:
                 pass
 
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":
-    player_name = "TeamName"  # Change this to your desired player name
+    player_name = "RutiRusso"  # Change this to your desired player name
     client = TriviaGameClient(player_name)
     client.start()

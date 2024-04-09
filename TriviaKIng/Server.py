@@ -11,26 +11,26 @@ import select
 
 # Trivia questions about food
 TRIVIA_QUESTIONS = {
-    "Qusetion: Carrots were originally purple": ['Y', 'T', 1],
-    "Qusetion: Bananas are berries.": ['F', 'N', 0],
-    "Qusetion: Peanuts are not nuts, they are legumes.": ['Y', 'T', 1],
-    "Qusetion: Honey never spoils.": ['Y', 'T', 1],
-    "Qusetion: Eating celery burns more calories than it contains.": ['F', 'N', 0],
-    "Qusetion: Almonds are a member of the peach family.": ['F', 'N', 0],
-    "Qusetion: Avocados are poisonous to birds.": ['Y', 'T', 1],
-    "Qusetion: Rice contains more arsenic than other grains.": ['F', 'N', 0],
-    "Qusetion: Apples float in water because they are 25% air": ['Y', 'T', 1],
-    "Qusetion: Carrots improve night vision": ['F', 'N', 0],
-    "Qusetion: Spinach is a good source of iron": ['Y', 'T', 1],
-    "Qusetion: Chocolate causes acne": ['F', 'N', 0],
-    "Qusetion: Garlic can help lower blood pressure": ['Y', 'T', 1],
-    "Qusetion: Milk helps to create mucus": ['F', 'N', 0],
-    "Qusetion: Pineapple can tenderize meat because it contains bromelain": ['Y', 'T', 1],
-    "Qusetion: Coffee stunts your growth": ['F', 'N', 0],
-    "Qusetion: Eating spicy food can boost metabolism": ['Y', 'T', 1],
-    "Qusetion: Turkey makes you sleepy because it contains high levels of tryptophan": ['F', 'N', 0],
-    "Qusetion: Coconut water is sterile and can be used as an emergency IV hydration fluid": ['Y', 'T', 1],
-    "Qusetion: Eating cheese before bed gives you nightmares": ['F', 'N', 0]
+    "Qusetion: Carrots were originally purple": ['Y', 'T', '1'],
+    "Qusetion: Bananas are berries.": ['F', 'N', '0'],
+    "Qusetion: Peanuts are not nuts, they are legumes.": ['Y', 'T', '1'],
+    "Qusetion: Honey never spoils.": ['Y', 'T', '1'],
+    "Qusetion: Eating celery burns more calories than it contains.": ['F', 'N', '0'],
+    "Qusetion: Almonds are a member of the peach family.": ['F', 'N', '0'],
+    "Qusetion: Avocados are poisonous to birds.": ['Y', 'T', '1'],
+    "Qusetion: Rice contains more arsenic than other grains.": ['F', 'N', '0'],
+    "Qusetion: Apples float in water because they are 25% air": ['Y', 'T', '1'],
+    "Qusetion: Carrots improve night vision": ['F', 'N', '0'],
+    "Qusetion: Spinach is a good source of iron": ['Y', 'T', '1'],
+    "Qusetion: Chocolate causes acne": ['F', 'N', '0'],
+    "Qusetion: Garlic can help lower blood pressure": ['Y', 'T', '1'],
+    "Qusetion: Milk helps to create mucus": ['F', 'N', '0'],
+    "Qusetion: Pineapple can tenderize meat because it contains bromelain": ['Y', 'T', '1'],
+    "Qusetion: Coffee stunts your growth": ['F', 'N', '0'],
+    "Qusetion: Eating spicy food can boost metabolism": ['Y', 'T', '1'],
+    "Qusetion: Turkey makes you sleepy because it contains high levels of tryptophan": ['F', 'N', '0'],
+    "Qusetion: Coconut water is sterile and can be used as an emergency IV hydration fluid": ['Y', 'T', '1'],
+    "Qusetion: Eating cheese before bed gives you nightmares": ['F', 'N', '0']
 }
 
 # Mutex for thread synchronization
@@ -160,14 +160,29 @@ class FoodTriviaServer:
             #     client_thread = threading.Thread(target=self.handle_client, args=(s, TRIVIA_QUESTIONS[question],))
             #     threads.append(client_thread)
             #     client_thread.start()
-            while time.time()-start <10:
-                try:
-                    answer, name = self.tcp_socket.recv(1024).decode().strip()
-                    if answer in TRIVIA_QUESTIONS[question]:
-                        self.winner = name
-                        break
-                except Exception:
-                    pass
+
+            # while time.time()-start <10:
+                # try:
+                #     answer = self.tcp_socket.recv(1024).decode().strip()
+                #     print(answer)
+                #     if answer in TRIVIA_QUESTIONS[question]:
+                #         self.winner = "sapir"
+                #         break
+                # except Exception:
+                #     pass
+            while time.time() - start < 10:
+                ready_to_read, _, _ = select.select(connected_clients_sockets, [], [], 0)
+                for client_socket in ready_to_read:
+                    try:
+                        answer = client_socket.recv(1024).decode().strip()
+                        if answer in TRIVIA_QUESTIONS[question]:
+                            print(answer)
+                            self.winner = playerName_with_his_socket[client_socket]
+                            break
+                    except Exception as e:
+                        pass
+                if self.winner:
+                    break
 
             if not self.winner==None:
                 lock.acquire()
@@ -177,11 +192,11 @@ class FoodTriviaServer:
                     self.Game_Started = False
                     ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     print(f"{self.winner} is correct! {self.winner} wins!")
-                    sendallclients(f"{self.winner} is correct! {self.winner} wins!".encode(), connected_clients_sockets)
+                    sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
                     print("Game over!")
-                    sendallclients("Game over!".encode(), connected_clients_sockets)
+                    sendallclients("Game over!", connected_clients_sockets)
                     print(f"Congratulations to the winner: {self.winner}")
-                    sendallclients(f"Congratulations to the winner: {self.winner}".encode(), connected_clients_sockets)
+                    sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
                 finally:
                     lock.release()
 
