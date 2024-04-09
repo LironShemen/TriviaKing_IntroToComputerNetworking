@@ -106,7 +106,7 @@ class FoodTriviaServer:
         udp_socket.bind((f"{self.MY_IP}", self.UDP_PORT))
         tcp_to_bits = self.TCP_PORT
         servernameencode = self.SERVER_NAME
-        offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + tcp_to_bits.to_bytes(2,                                                                                                        'big')
+        offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode('utf-8').ljust(32) + tcp_to_bits.to_bytes(2,                                                                                                        'big')
         while not self.Game_Started:
             try:
                 udp_socket.sendto(offer_message, ('<broadcast>', self.UDP_PORT))

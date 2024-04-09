@@ -47,7 +47,7 @@ class TriviaGameClient:
         tcp_port_bytes = data[37:]
         tcp_port = int.from_bytes(tcp_port_bytes, 'big')
         self.server_port = tcp_port
-        self.handle_offer(data[5:37].strip(), addr[0])
+        self.handle_offer(data[5:37].decode('utf-8'), addr[0])
 
         if self.state == "connecting_to_server":
             self.connect_to_server()
