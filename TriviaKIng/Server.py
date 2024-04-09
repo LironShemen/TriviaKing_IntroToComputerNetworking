@@ -75,7 +75,7 @@ class FoodTriviaServer:
         self.tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.TCP_PORT = find_available_port(self.TCP_PORT)
         self.tcp_socket.bind(('', self.TCP_PORT))
-        self.tcp_socket.listen(5)
+        self.tcp_socket.listen()
         print("Server started, listening on IP address 172.1.0.4")
         timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
         while True:
@@ -114,9 +114,9 @@ class FoodTriviaServer:
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         while not self.Game_Started:
             try:
-                udp_to_bits = 12345
+                tcp_to_bits = self.TCP_PORT
                 servernameencode = self.SERVER_NAME
-                offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
+                offer_message = self.MAGIC_COOKIE + b'\x02' + servernameencode.encode().ljust(32) + tcp_to_bits.to_bytes(2, 'big')
                 udp_socket.sendto(offer_message, ('<broadcast>', self.UDP_PORT))
                 time.sleep(1)  # Adjust as needed to control the rate of message sending
             except Exception as e:
