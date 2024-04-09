@@ -138,6 +138,7 @@ class FoodTriviaServer:
         welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
         print(welcome)
         sendallclients(welcome, connected_clients_sockets)
+        start = time.time()
 
         for idx, player in enumerate(connected_clients, start=1):
             print(f"Player {idx}: {player}\n")
@@ -155,10 +156,15 @@ class FoodTriviaServer:
             #timer.start()
             threads = []
 
-            for s in connected_clients_sockets:
-                client_thread = threading.Thread(target=self.handle_client, args=(s, TRIVIA_QUESTIONS[question],))
-                threads.append(client_thread)
-                client_thread.start()
+            # for s in connected_clients_sockets:
+            #     client_thread = threading.Thread(target=self.handle_client, args=(s, TRIVIA_QUESTIONS[question],))
+            #     threads.append(client_thread)
+            #     client_thread.start()
+            while time.time()-start <10:
+                answer, name = self.tcp_socket.recv(1024).decode().strip()
+                if answer in TRIVIA_QUESTIONS[question]:
+                    self.winner = name
+                    break
 
             if not self.winner==None:
                 lock.acquire()
@@ -167,12 +173,12 @@ class FoodTriviaServer:
                         self.GAME_OVER = True
                     self.Game_Started = False
                     ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    print(f"{player} is correct! {player} wins!")
-                    sendallclients(f"{player} is correct! {player} wins!".encode(), connected_clients_sockets)
+                    print(f"{self.winner} is correct! {self.winner} wins!")
+                    sendallclients(f"{self.winner} is correct! {self.winner} wins!".encode(), connected_clients_sockets)
                     print("Game over!")
                     sendallclients("Game over!".encode(), connected_clients_sockets)
-                    print(f"Congratulations to the winner: {player}")
-                    sendallclients(f"Congratulations to the winner: {player}".encode(), connected_clients_sockets)
+                    print(f"Congratulations to the winner: {self.winner}")
+                    sendallclients(f"Congratulations to the winner: {self.winner}".encode(), connected_clients_sockets)
                 finally:
                     lock.release()
 
@@ -208,7 +214,6 @@ class FoodTriviaServer:
         client_socket.settimeout(10)
         try:
             answer = self.receive_answer(client_socket,start_time)
-            print(answer)
         except socket.timeout:
             answer = None
             pass
@@ -216,6 +221,8 @@ class FoodTriviaServer:
         self.check_winner_dictionary[player] = [answer,time.time() - start_time]
         if answer in correct_answer and client_socket in self.temp_socket_list:
             self.winner = player
+            print(answer)
+
             # lock.acquire()
             # try:
             #     with self.GAME_OVER_Lock:
