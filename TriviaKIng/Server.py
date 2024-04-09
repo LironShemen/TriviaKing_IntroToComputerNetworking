@@ -198,8 +198,10 @@ class FoodTriviaServer:
                     sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
                     print("Game over, sending out offer requests...")
                     sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
-                    self.tcp_socket.close()
-                    self.Game_Started = "No"
+                    connected_clients_sockets = []
+                    connected_clients = []
+                    playerName_with_his_socket = {}
+                    # self.tcp_socket.close()
 
                 finally:
                     lock.release()
@@ -222,9 +224,11 @@ class FoodTriviaServer:
         # if there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
         elif (len(connected_clients) > 1):
             with self.game_lock:
-                if not self.Game_Started:
-                    self.Game_Started = True
+                if self.Game_Started == "No":
+                    self.Game_Started = "Yes"
                     self.run_game()
+        elif self.Game_Started == "Finish":
+            self.Game_Started = "No"
 
     def time_out_handler_in_game(self):
         self.Game_Started = True
