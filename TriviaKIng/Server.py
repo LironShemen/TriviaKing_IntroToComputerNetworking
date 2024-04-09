@@ -66,7 +66,7 @@ class FoodTriviaServer:
         self.QUESTION_TIMEOUT = 10  # seconds
         self.GAME_QUESTION_COUNT = 20
         self.GAME_OVER = False
-
+        self.MY_IP = 0
 
     def start(self):
         global TCP_PORT
@@ -74,7 +74,8 @@ class FoodTriviaServer:
         #open tcp socket
         self.tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.TCP_PORT = find_available_port(self.TCP_PORT)
-        self.tcp_socket.bind(('', self.TCP_PORT))
+        self.MY_IP = get_my_ip()
+        self.tcp_socket.bind((self.MY_IP, self.TCP_PORT))
         self.tcp_socket.listen()
         print("Server started, listening on IP address 172.1.0.4")
         timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
@@ -103,13 +104,6 @@ class FoodTriviaServer:
         self.udp_thread.start()
 
     def send_offer_message(self):
-        # while not self.Game_Started:
-        #     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        #     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        #     udp_to_bits = 13117
-        #     offer_message = self.MAGIC_COOKIE + b'\x02' + self.SERVER_NAME.encode().ljust(32) + udp_to_bits.to_bytes(2, 'big')
-        #     udp_socket.sendto(offer_message, ('172.1.0.4', self.UDP_PORT))
-            #udp_socket.close()
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         while not self.Game_Started:
@@ -160,14 +154,6 @@ class FoodTriviaServer:
                 t.join()
 
             timer.cancel()
-
-            # for player,values in self.check_winner_dictionary:
-            #     min_time = math.inf
-            #     if values[0] in TRIVIA_QUESTIONS[question]:
-            #         self.is_player_answer_right = True
-            #         if values[1] < min_time:
-            #             winner = player
-
 
 
 
@@ -221,6 +207,22 @@ def find_available_port(start_port):
     while is_port_in_use(start_port):
         port += 1
     return port
+
+
+def get_my_ip():
+    try:
+        # Create a socket object
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Connect to a known address
+        s.connect(("8.8.8.8", 80))
+        # Get the socket's own address
+        ip_address = s.getsockname()[0]
+        # Close the socket
+        s.close()
+        return ip_address
+    except Exception as e:
+        print("Error occurred while retrieving IP address:", e)
+        return None
 
 if __name__ == "__main__":
     server = FoodTriviaServer()
