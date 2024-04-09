@@ -79,9 +79,12 @@ class TriviaGameClient:
             if data.decode().startswith("Game over, sending out offer requests..."):
                 print("Server disconnected, listening for offer requests...")
                 self.tcp_socket.close()
-            if data.decode().startswith("Qusetion: "):
-                key = keyboard.read_event().name
-                self.tcp_socket.send(key.encode())
+            try:
+                if data.decode().startswith("Qusetion: "):
+                    key = keyboard.read_event().name
+                    self.tcp_socket.send(key.encode())
+            except:
+                pass
 
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
