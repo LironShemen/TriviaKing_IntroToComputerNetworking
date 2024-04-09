@@ -66,6 +66,7 @@ class FoodTriviaServer:
         self.GAME_OVER = False
         self.MY_IP = 0
         self.game_lock = threading.Lock()
+        self.GAME_OVER_Lock = threading.Lock()
 
     def start(self):
         global TCP_PORT
@@ -94,6 +95,7 @@ class FoodTriviaServer:
                 #print("Server manually stopped.")
         self.tcp_socket.close()
         print("Game over, sending out offer requests...")
+        sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
         self.udp_thread.join()
         # global UDP_PORT
         # UDP_PORT += 1
@@ -142,12 +144,12 @@ class FoodTriviaServer:
             question = random.choice(list(TRIVIA_QUESTIONS.keys()))
             print("\n==")
             print(question)
-            sendallclients("==\n", connected_clients_sockets)
+            sendallclients("\n==\n", connected_clients_sockets)
             sendallclients(question+"\n", connected_clients_sockets)
 
             self.temp_socket_list = connected_clients_sockets
-            timer = threading.Timer(10,self.time_out_handler_in_game)
-            timer.start()
+            # timer = threading.Timer(10,self.time_out_handler_in_game)
+            # timer.start()
             threads = []
 
             for s in connected_clients_sockets:
@@ -159,7 +161,7 @@ class FoodTriviaServer:
             #     t.join()
             time.sleep(10)
 
-            timer.cancel()
+            # timer.cancel()
 
 
 
@@ -187,7 +189,8 @@ class FoodTriviaServer:
         answer = self.receive_answer(client_socket,start_time)
         self.check_winner_dictionary[player] = [answer,time.time() - start_time]
         if answer in correct_answer and client_socket in self.temp_socket_list:
-            self.GAME_OVER = True
+            with self.GAME_OVER_Lock:
+                self.GAME_OVER = True
             self.Game_Started = False
             ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             print(f"{player} is correct! {player} wins!")

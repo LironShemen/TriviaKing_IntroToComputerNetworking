@@ -19,13 +19,6 @@ class TriviaGameClient:
     def start(self):
         udp_socket = self.setup_udp_socket()
         self.listen_for_offers(udp_socket)
-    # def start(self):
-    #     try:
-    #         udp_socket = self.setup_udp_socket()
-    #         if udp_socket:
-    #             self.listen_for_offers(udp_socket)
-    #     except Exception as e:
-    #         print(f"Error starting client: {e}")
 
     #Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
     def setup_udp_socket(self):
@@ -83,32 +76,12 @@ class TriviaGameClient:
             data, _ = self.tcp_socket.recvfrom(self.buffer_size)
             print(data.decode())
             # Get input from the user
+            if data.decode().startswith("Game over, sending out offer requests..."):
+                self.tcp_socket.close()
             if data.decode().startswith("Qusetion: "):
                 key = keyboard.read_event().name
                 self.tcp_socket.send(key.encode())
 
-
-            # Send the user's input to the server
-            # self.tcp_socket.sendall(user_input.encode())
-
-
-    # def game_mode(self):
-    #     inputs = [self.tcp_socket, sys.stdin]
-    #
-    #     while True:
-    #         readable, _, _ = select.select(inputs, [], [])
-    #         for sock in readable:
-    #             if sock == self.tcp_socket:
-    #                 data = sock.recv(self.buffer_size)
-    #                 if not data:
-    #                     print("Server disconnected, listening for offer requests...")
-    #                     self.state = "looking_for_server"
-    #                     return
-    #                 else:
-    #                     print(data.decode('utf-8'), end='')
-    #             elif sock == sys.stdin:
-    #                 user_input = sys.stdin.readline().strip()
-    #                 self.tcp_socket.sendall((user_input + '\n').encode('utf-8'))
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":
