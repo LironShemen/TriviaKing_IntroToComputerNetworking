@@ -82,6 +82,7 @@ class TriviaGameClient:
             try:
                 if data.decode().startswith("Qusetion: "):
                     key = keyboard.read_event().name
+                    print("\n")
                     # self.tcp_socket.send(key.encode(), self.player_name.encode())
                     self.tcp_socket.send(key.encode())
             except:

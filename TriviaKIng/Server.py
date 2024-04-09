@@ -190,7 +190,6 @@ class FoodTriviaServer:
                     with self.GAME_OVER_Lock:
                         self.GAME_OVER = True
                     self.Game_Started = False
-                    ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     print(f"{self.winner} is correct! {self.winner} wins!")
                     sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
                     print("Game over!")
