@@ -65,6 +65,7 @@ class FoodTriviaServer:
         self.GAME_QUESTION_COUNT = 20
         self.GAME_OVER = False
         self.MY_IP = 0
+        self.game_lock = threading.Lock()
 
     def start(self):
         global TCP_PORT
@@ -77,7 +78,7 @@ class FoodTriviaServer:
         self.tcp_socket.listen()
         print("Server started, listening on IP address "+ f'{self.MY_IP}')
         # timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
-        while True:
+        while not self.Game_Started:
             try:
                 client_socket, address = self.tcp_socket.accept()
                 connected_clients_sockets.append(client_socket)
@@ -130,18 +131,21 @@ class FoodTriviaServer:
         global connected_clients, connected_clients_sockets
         # Choose random trivia question
         question = random.choice(list(TRIVIA_QUESTIONS.keys()))
-        print("\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.")
-        #SEND WELCOME TO ALL CLIENTS!!!!!!!!!!!!!!!!!!!
+        welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
+        print(welcome)
+        sendallclients(welcome, connected_clients_sockets)
+
         for idx, player in enumerate(connected_clients, start=1):
-            print(f"Player {idx}: {player}")
-        print("==")
-        print(question)
-        for client_socket in connected_clients_sockets:
-            client_socket.sendall(question.encode())
+            print(f"Player {idx}: {player}\n")
+            sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
 
         while not self.GAME_OVER:
+            print("==")
+            print(question)
+            sendallclients(question, connected_clients_sockets)
+
             self.temp_socket_list = connected_clients_sockets
-            timer = threading.Timer(10,threading.Event().set)
+            timer = threading.Timer(10,self.time_out_handler_in_game)
             timer.start()
             threads = []
 
@@ -161,9 +165,15 @@ class FoodTriviaServer:
         if(len(connected_clients) == 1):
             print("Can't start game with only one player. Keep waiting for another player")
             #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
+        # if there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
         elif (len(connected_clients) > 1):
-                self.Game_Started = True
-                self.run_game()
+            with self.game_lock:
+                if not self.Game_Started:
+                    self.Game_Started = True
+                    self.run_game()
+
+    def time_out_handler_in_game(self):
+        self.Game_Started = True
 
     def handle_client(self, client_socket, correct_answer):
         start_time = time.time()
@@ -224,6 +234,10 @@ def get_my_ip():
     except Exception as e:
         print("Error occurred while retrieving IP address:", e)
         return None
+
+def sendallclients(data, clients_socket):
+    for client_socket in clients_socket:
+        client_socket.sendall(data.encode())
 
 if __name__ == "__main__":
     server = FoodTriviaServer()
