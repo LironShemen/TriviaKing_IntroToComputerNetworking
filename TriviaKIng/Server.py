@@ -162,9 +162,12 @@ class FoodTriviaServer:
 
 
     def time_out_handler(self):
+        global connected_clients_sockets
         if(len(connected_clients) == 1):
-            print("Can't start game with only one player. Keep waiting for another player")
-            #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
+            message = "Can't start game with only one player. Keep waiting for another player"
+            print(message)
+            sendallclients(message, connected_clients_sockets)
+        #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
         # if there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
         elif (len(connected_clients) > 1):
             with self.game_lock:
@@ -183,7 +186,7 @@ class FoodTriviaServer:
         if answer in correct_answer and client_socket in self.temp_socket_list:
             self.GAME_OVER = True
             self.Game_Started = False
-            ###########SENT TO ALL CLIENTS!!!!!!!!!!!!!!!!!!
+            ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             print(f"{player} is correct! {player} wins!")
             client_socket.sendall(f"{player} is correct! {player} wins!".encode())
             print("Game over!")
@@ -197,12 +200,9 @@ class FoodTriviaServer:
 
     def receive_answer(self, client_socket):
         while True:
-            ready, _, _ = select.select([client_socket], [], [], 1)  # Wait for 1 second for input
-
-            if ready:
-                # Receive answer from client
-                answer = client_socket.recv(1024).decode().strip()
-                return answer
+            # Receive answer from client
+            answer = client_socket.recv(1024).decode().strip()
+            return answer
 
 
 
