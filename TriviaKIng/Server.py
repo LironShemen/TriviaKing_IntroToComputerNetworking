@@ -183,7 +183,7 @@ class FoodTriviaServer:
     def handle_client(self, client_socket, correct_answer):
         start_time = time.time()
         player = playerName_with_his_socket[client_socket]
-        answer = self.receive_answer(client_socket)
+        answer = self.receive_answer(client_socket,start_time)
         self.check_winner_dictionary[player] = [answer,time.time() - start_time]
         if answer in correct_answer and client_socket in self.temp_socket_list:
             self.GAME_OVER = True
@@ -200,13 +200,15 @@ class FoodTriviaServer:
             self.temp_socket_list.remove(client_socket)
 
 
-    def receive_answer(self, client_socket):
-        while True:
+    def receive_answer(self, client_socket, start_time):
+        answer=None
+        while (time.time()-start_time<10):
             # Receive answer from client
             answer = client_socket.recv(1024).decode().strip()
-            if not answer:
-                answer = None
-            return answer
+            if answer:
+                return answer
+        if not answer:
+            return None
 
 
 
