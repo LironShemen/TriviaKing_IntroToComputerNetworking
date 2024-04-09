@@ -27,7 +27,6 @@ class TriviaGameClient:
         if hasattr(socket, 'SO_REUSEPORT'):
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         udp_socket.bind(('0.0.0.0', 13117))
-        data, adress = udp_socket.recvfrom(self.buffer_size)
         return udp_socket
 
 
@@ -38,7 +37,10 @@ class TriviaGameClient:
 
         data, addr = udp_socket.recvfrom(self.buffer_size)
 
-        self.server_port = addr[1]
+        tcp_port_bytes = data[37:]
+        tcp_port = int.from_bytes(tcp_port_bytes, 'big')
+        self.server_port = tcp_port
+        print(self.server_port)
         self.handle_offer(data[5:37].strip(), addr[0])
 
         if self.state == "connecting_to_server":
