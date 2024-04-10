@@ -26,8 +26,7 @@ class TriviaGameClient:
         # port = Server.find_available_port(12345)
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #Set SO_REUSEPORT option if available
-        if hasattr(socket, 'SO_REUSEPORT'):
-            udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udp_socket.bind(('', 13117))
         return udp_socket
 
@@ -88,9 +87,12 @@ class TriviaGameClient:
                     self.state = "looking_for_server"
                     self.listen_for_offers(self.udp_socket)
                 if decoded_data.startswith("Qusetion: "):
-                    key = keyboard.read_event().name
-                    print("\n")
-                    self.tcp_socket.sendall(key.encode())
+                    # key = keyboard.read_event().name
+                    # print("\n")
+                    # self.tcp_socket.sendall(key.encode())
+                    answer = input()  # Prompt user for answer
+                    if answer.strip():  # Check if the answer is not empty (user input something)
+                        self.tcp_socket.sendall(answer.encode())  # Send the answer to the server
             except:
                 pass
 

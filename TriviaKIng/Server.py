@@ -109,6 +109,7 @@ class FoodTriviaServer:
 
     def send_offer_message(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         udp_socket.bind((f"{self.MY_IP}", self.UDP_PORT))
         tcp_to_bits = self.TCP_PORT
