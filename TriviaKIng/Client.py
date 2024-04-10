@@ -50,9 +50,11 @@ class TriviaGameClient:
 
             if self.state == "connecting_to_server":
                 self.connect_to_server()
+                self.udp_socket.close()
 
             if self.state == "game_mode":
                 self.game_mode()
+                self.udp_socket = self.setup_udp_socket()
 
     #Handles the offer received from the server. It sets the server address and changes
     # the state to "connecting_to_server".
@@ -77,7 +79,7 @@ class TriviaGameClient:
     # It uses select to wait for data on the TCP socket or user input from stdin.
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
-        while True:
+        while self.state == "game_mode":
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
