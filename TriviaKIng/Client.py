@@ -89,12 +89,21 @@ class TriviaGameClient:
                     self.state = "looking_for_server"
                     self.listen_for_offers(self.udp_socket)
                 if decoded_data.startswith("Qusetion: "):
-                    key = keyboard.read_event().name
-                    print("\n")
-                    if key.strip():  # Check if the answer is not empty (user input something)
-                        self.tcp_socket.sendall(key.encode())  # Send the answer to the server
-                    else:  # If the user didn't input an answer
-                        self.tcp_socket.sendall(b"\n")
+                    # Wait for user input with a timeout of 1 second
+                    event = keyboard.wait("down", timeout=10)
+                    if event:
+                        key = event.name
+                        print("\n")
+                        if key.strip():  # Check if the answer is not empty (user input something)
+                            self.tcp_socket.sendall(key.encode())  # Send the answer to the server
+                        else:  # If the user didn't input an answer
+                            self.tcp_socket.sendall(b"\n")
+                    # key = keyboard.read_event().name
+                    # print("\n")
+                    # if key.strip():  # Check if the answer is not empty (user input something)
+                    #     self.tcp_socket.sendall(key.encode())  # Send the answer to the server
+                    # else:  # If the user didn't input an answer
+                    #     self.tcp_socket.sendall(b"\n")
             except:
                 pass
 
