@@ -14,11 +14,12 @@ class TriviaGameClient:
         self.state = "looking_for_server"
         self.buffer_size = 1024
         self.server_port = 13117
+        self.udp_socket = None
 
     #Starts the client by setting up a UDP socket and listening for offers from the server.
     def start(self):
-        udp_socket = self.setup_udp_socket()
-        self.listen_for_offers(udp_socket)
+        self.udp_socket = self.setup_udp_socket()
+        self.listen_for_offers(self.udp_socket)
 
     #Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
     def setup_udp_socket(self):
@@ -87,11 +88,12 @@ class TriviaGameClient:
                     # self.tcp_socket.send(key.encode(), self.player_name.encode())
                     self.tcp_socket.send(key.encode())
             except:
-                pass
+                self.listen_for_offers(self.udp_socket)
+
 
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":
-    player_name = "RutiRusso"  # Change this to your desired player name
+    player_name = "RutiBrudo"  # Change this to your desired player name
     client = TriviaGameClient(player_name)
     client.start()
