@@ -81,14 +81,17 @@ class TriviaGameClient:
                 if data.decode().startswith("Game over, sending out offer requests..."):
                     print("Server disconnected, listening for offer requests...")
                     self.tcp_socket.close()
+                    self.state = "looking_for_server"
+                    self.listen_for_offers(self.udp_socket)
+
 
                 if data.decode().startswith("Qusetion: "):
                     key = keyboard.read_event().name
                     print("\n")
                     # self.tcp_socket.send(key.encode(), self.player_name.encode())
-                    self.tcp_socket.send(key.encode())
+                    self.tcp_socket.sendall(key.encode())
             except:
-                self.listen_for_offers(self.udp_socket)
+                pass
 
 
 
