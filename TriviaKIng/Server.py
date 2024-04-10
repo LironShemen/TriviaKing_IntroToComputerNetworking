@@ -83,27 +83,28 @@ class FoodTriviaServer:
         self.tcp_socket.listen()
         print("Server started, listening on IP address "+ f'{self.MY_IP}')
         # timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
-        while self.Game_Started=="No":
-            try:
-                client_socket, address = self.tcp_socket.accept()
-                connected_clients_sockets.append(client_socket)
-                threading.Timer(10, self.time_out_handler).start()
-                print(f"New connection from {address}")
-                client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
-                self.clients_threads.append(client_thread)
-                client_thread.start()
-            except TimeoutError:
-                # if(len(connected_clients)==1):
-                #     print("Can't start game with only one player. Keep waiting for another player")
-                    pass
-                #print("Server manually stopped.")
-        # print("Game over, sending out offer requests...")
-        # sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
-        self.tcp_socket.close()
-        self.udp_thread.join()
-        self.udp_thread = threading.Thread(target=self.send_offer_message)
-        self.udp_thread.daemon = True
-        self.udp_thread.start()
+        while True:
+            while self.Game_Started=="No":
+                try:
+                    client_socket, address = self.tcp_socket.accept()
+                    connected_clients_sockets.append(client_socket)
+                    threading.Timer(10, self.time_out_handler).start()
+                    print(f"New connection from {address}")
+                    client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
+                    self.clients_threads.append(client_thread)
+                    client_thread.start()
+                except TimeoutError:
+                    # if(len(connected_clients)==1):
+                    #     print("Can't start game with only one player. Keep waiting for another player")
+                        pass
+                    #print("Server manually stopped.")
+            # print("Game over, sending out offer requests...")
+            # sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+            self.tcp_socket.close()
+            self.udp_thread.join()
+            self.udp_thread = threading.Thread(target=self.send_offer_message)
+            self.udp_thread.daemon = True
+            self.udp_thread.start()
 
     def send_offer_message(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
