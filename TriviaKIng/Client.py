@@ -1,5 +1,7 @@
 import socket
 import sys
+import time
+
 import select
 import Server
 import keyboard
@@ -90,9 +92,13 @@ class TriviaGameClient:
                     # key = keyboard.read_event().name
                     # print("\n")
                     # self.tcp_socket.sendall(key.encode())
-                    answer = input()  # Prompt user for answer
-                    if answer.strip():  # Check if the answer is not empty (user input something)
-                        self.tcp_socket.sendall(answer.encode())  # Send the answer to the server
+                    start_time = time.time()
+                    while time.time() - start_time < 10:
+                        if keyboard.is_pressed():  # assuming you're using keyboard module
+                            key = keyboard.read_event().name
+                            print("\n")
+                            self.tcp_socket.sendall(key.encode())
+                            break
             except:
                 pass
 
