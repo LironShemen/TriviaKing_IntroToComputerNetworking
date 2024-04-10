@@ -235,8 +235,9 @@ class FoodTriviaServer:
                     self.Game_Started = "Yes"
                     self.udp_thread.join()
                     self.run_game()
-        elif self.Game_Started == "Finish":
+        if self.Game_Started == "Finish":
             self.Game_Started = "No"
+            threading.Thread(target=self.send_offer_message).start()
 
     def time_out_handler_in_game(self):
         self.Game_Started = True

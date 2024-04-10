@@ -38,20 +38,21 @@ class TriviaGameClient:
     #Listens for offer requests from the server. It uses select to check if there is any
     # data available to read on the UDP socket. If an offer is received, it calls handle_offer method.
     def listen_for_offers(self, udp_socket):
-        print("Client started, listening for offer requests...")
+        while True:
+            print("Client started, listening for offer requests...")
 
-        data, addr = udp_socket.recvfrom(self.buffer_size)
+            data, addr = udp_socket.recvfrom(self.buffer_size)
 
-        tcp_port_bytes = data[37:]
-        tcp_port = int.from_bytes(tcp_port_bytes, 'big')
-        self.server_port = tcp_port
-        self.handle_offer(data[5:37].decode('utf-8'), addr[0])
+            tcp_port_bytes = data[37:]
+            tcp_port = int.from_bytes(tcp_port_bytes, 'big')
+            self.server_port = tcp_port
+            self.handle_offer(data[5:37].decode('utf-8'), addr[0])
 
-        if self.state == "connecting_to_server":
-            self.connect_to_server()
+            if self.state == "connecting_to_server":
+                self.connect_to_server()
 
-        if self.state == "game_mode":
-            self.game_mode()
+            if self.state == "game_mode":
+                self.game_mode()
 
     #Handles the offer received from the server. It sets the server address and changes
     # the state to "connecting_to_server".
@@ -89,7 +90,7 @@ class TriviaGameClient:
                     print("Server disconnected, listening for offer requests...")
                     self.tcp_socket.close()
                     self.state = "looking_for_server"
-                    self.listen_for_offers(self.udp_socket)
+                    # self.listen_for_offers(self.udp_socket)
                 if decoded_data.startswith("Qusetion: "):
                     key = keyboard.read_event().name
                     print("\n")
