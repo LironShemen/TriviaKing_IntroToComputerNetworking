@@ -167,12 +167,12 @@ class FoodTriviaServer:
                         pass
 
             # Create a thread for each connected client to handle their answer
-            threads = []
+            threads_game_running = []
             for client_socket in connected_clients_sockets:
-                client_thread = threading.Thread(target=handle_client_answer, args=(client_socket, question))
-                client_thread.daemon = True  # Set thread as daemon
-                client_thread.start()
-                threads.append(client_thread)
+                client_thread_run_the_game = threading.Thread(target=handle_client_answer, args=(client_socket, question))
+                client_thread_run_the_game.daemon = True  # Set thread as daemon
+                client_thread_run_the_game.start()
+                threads_game_running.append(client_thread_run_the_game)
 
             # Wait for all threads to finish or for the timeout
             timeout_seconds = 10
@@ -183,6 +183,10 @@ class FoodTriviaServer:
             # If a winner is determined within the timeout period, break the loop
             if self.winner:
                 break
+
+            for t in threads_game_running:
+                if t.is_alive():
+                    t.join(timeout=0)
 
             # Wait for a brief interval before proceeding to the next question
             time.sleep(2)
@@ -214,7 +218,7 @@ class FoodTriviaServer:
             print(message)
             sendallclients(message, connected_clients_sockets)
         #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
-        # if there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
+        # If there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
         elif (len(connected_clients) > 1):
             with self.game_lock:
                 if self.Game_Started == "No":
@@ -241,21 +245,6 @@ class FoodTriviaServer:
         if answer in correct_answer and client_socket in self.temp_socket_list:
             self.winner = player
             print(answer)
-
-            # lock.acquire()
-            # try:
-            #     with self.GAME_OVER_Lock:
-            #         self.GAME_OVER = True
-            #     self.Game_Started = False
-            #     ###send all clients !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #     print(f"{player} is correct! {player} wins!")
-            #     sendallclients(f"{player} is correct! {player} wins!".encode(), connected_clients_sockets)
-            #     print("Game over!")
-            #     sendallclients("Game over!".encode(), connected_clients_sockets)
-            #     print(f"Congratulations to the winner: {player}")
-            #     sendallclients(f"Congratulations to the winner: {player}".encode(), connected_clients_sockets)
-            # finally:
-            #     lock.release()
             ###can add game statistics
         if answer not in correct_answer:
             self.temp_socket_list.remove(client_socket)
