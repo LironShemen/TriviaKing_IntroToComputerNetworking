@@ -99,7 +99,7 @@ class FoodTriviaServer:
                 #print("Server manually stopped.")
         # print("Game over, sending out offer requests...")
         # sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
-        # self.tcp_socket.close()
+        self.tcp_socket.close()
         self.udp_thread.join()
         self.udp_thread = threading.Thread(target=self.send_offer_message)
         self.udp_thread.daemon = True
@@ -234,14 +234,15 @@ class FoodTriviaServer:
 
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
-                try:
-                    answer = client_socket.recv(1024).decode().strip()
-                    if answer in TRIVIA_QUESTIONS[question]:
-                        with self.winner_lock:
-                            if self.winner is None:  # Check if winner is not already set
-                                self.winner = playerName_with_his_socket[client_socket]
-                except Exception as e:
-                    pass
+                while not self.winner:
+                    try:
+                        answer = client_socket.recv(1024).decode().strip()
+                        if answer in TRIVIA_QUESTIONS[question]:
+                            with self.winner_lock:
+                                if self.winner is None:  # Check if winner is not already set
+                                    self.winner = playerName_with_his_socket[client_socket]
+                    except Exception as e:
+                        pass
 
             # Create a thread for each connected client to handle their answer
             threads = []
@@ -263,7 +264,7 @@ class FoodTriviaServer:
 
             # Wait for a brief interval before proceeding to the next question
             time.sleep(2)
-        
+
 
         # Game over: announce the winner
         print(f"{self.winner} is correct! {self.winner} wins!")
