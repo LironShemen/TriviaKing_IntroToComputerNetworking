@@ -131,87 +131,142 @@ class FoodTriviaServer:
         self.check_winner_dictionary[player_name] = [None,0]
 
 
+    # def run_game(self):
+    #     self.winner = None
+    #     global connected_clients, connected_clients_sockets, playerName_with_his_socket
+    #     # Choose random trivia question
+    #     welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
+    #     print(welcome)
+    #     sendallclients(welcome, connected_clients_sockets)
+    #
+    #     for idx, player in enumerate(connected_clients, start=1):
+    #         print(f"Player {idx}: {player}\n")
+    #         sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
+    #
+    #     while not self.GAME_OVER:
+    #         question = random.choice(list(TRIVIA_QUESTIONS.keys()))
+    #         print("\n==")
+    #         print(question)
+    #         sendallclients("\n==\n", connected_clients_sockets)
+    #         sendallclients(question+"\n", connected_clients_sockets)
+    #         start = time.time()
+    #
+    #         self.temp_socket_list = connected_clients_sockets
+    #         #timer = threading.Timer(10,self.time_out_handler_in_game)
+    #         #timer.start()
+    #         threads = []
+    #
+    #         # for s in connected_clients_sockets:
+    #         #     client_thread = threading.Thread(target=self.handle_client, args=(s, TRIVIA_QUESTIONS[question],))
+    #         #     threads.append(client_thread)
+    #         #     client_thread.start()
+    #
+    #         # while time.time()-start <10:
+    #             # try:
+    #             #     answer = self.tcp_socket.recv(1024).decode().strip()
+    #             #     print(answer)
+    #             #     if answer in TRIVIA_QUESTIONS[question]:
+    #             #         self.winner = "sapir"
+    #             #         break
+    #             # except Exception:
+    #             #     pass
+    #         while time.time() - start < 10:
+    #             ready_to_read, _, _ = select.select(connected_clients_sockets, [], [], 0)
+    #             for client_socket in ready_to_read:
+    #                 try:
+    #                     answer = client_socket.recv(1024).decode().strip()
+    #                     if answer in TRIVIA_QUESTIONS[question]:
+    #                         print(answer)
+    #                         print(len(playerName_with_his_socket))
+    #                         self.winner = playerName_with_his_socket[client_socket]
+    #                         break
+    #                 except Exception as e:
+    #                     pass
+    #             if self.winner:
+    #                 break
+    #
+    #         if not self.winner==None:
+    #             lock.acquire()
+    #             try:
+    #                 with self.GAME_OVER_Lock:
+    #                     self.GAME_OVER = True
+    #                 self.Game_Started = "Finish"
+    #                 print(f"{self.winner} is correct! {self.winner} wins!")
+    #                 sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
+    #                 print("Game over!")
+    #                 sendallclients("Game over!", connected_clients_sockets)
+    #                 print(f"Congratulations to the winner: {self.winner}")
+    #                 sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
+    #                 print("Game over, sending out offer requests...")
+    #                 sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+    #                 connected_clients_sockets = []
+    #                 connected_clients = []
+    #                 playerName_with_his_socket = {}
+    #                 # self.tcp_socket.close()
+    #
+    #             finally:
+    #                 lock.release()
+    #
+    #         # for t in threads:
+    #         #     t.join()
+    #         time.sleep(10)
+    #
+    #         #timer.cancel()
     def run_game(self):
         self.winner = None
-        global connected_clients, connected_clients_sockets, playerName_with_his_socket
+        global connected_clients_sockets, playerName_with_his_socket
+
         # Choose random trivia question
-        welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
-        print(welcome)
-        sendallclients(welcome, connected_clients_sockets)
-
-        for idx, player in enumerate(connected_clients, start=1):
-            print(f"Player {idx}: {player}\n")
-            sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
-
-        while not self.GAME_OVER:
+        while not self.winner:
             question = random.choice(list(TRIVIA_QUESTIONS.keys()))
             print("\n==")
             print(question)
             sendallclients("\n==\n", connected_clients_sockets)
-            sendallclients(question+"\n", connected_clients_sockets)
-            start = time.time()
+            sendallclients(question + "\n", connected_clients_sockets)
 
-            self.temp_socket_list = connected_clients_sockets
-            #timer = threading.Timer(10,self.time_out_handler_in_game)
-            #timer.start()
-            threads = []
-
-            # for s in connected_clients_sockets:
-            #     client_thread = threading.Thread(target=self.handle_client, args=(s, TRIVIA_QUESTIONS[question],))
-            #     threads.append(client_thread)
-            #     client_thread.start()
-
-            # while time.time()-start <10:
-                # try:
-                #     answer = self.tcp_socket.recv(1024).decode().strip()
-                #     print(answer)
-                #     if answer in TRIVIA_QUESTIONS[question]:
-                #         self.winner = "sapir"
-                #         break
-                # except Exception:
-                #     pass
-            while time.time() - start < 10:
-                ready_to_read, _, _ = select.select(connected_clients_sockets, [], [], 0)
-                for client_socket in ready_to_read:
-                    try:
-                        answer = client_socket.recv(1024).decode().strip()
-                        if answer in TRIVIA_QUESTIONS[question]:
-                            print(answer)
-                            print(len(playerName_with_his_socket))
-                            self.winner = playerName_with_his_socket[client_socket]
-                            break
-                    except Exception as e:
-                        pass
-                if self.winner:
-                    break
-
-            if not self.winner==None:
-                lock.acquire()
+            # Function to handle each client's answer
+            def handle_client_answer(client_socket, question):
                 try:
-                    with self.GAME_OVER_Lock:
-                        self.GAME_OVER = True
-                    self.Game_Started = "Finish"
-                    print(f"{self.winner} is correct! {self.winner} wins!")
-                    sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
-                    print("Game over!")
-                    sendallclients("Game over!", connected_clients_sockets)
-                    print(f"Congratulations to the winner: {self.winner}")
-                    sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
-                    print("Game over, sending out offer requests...")
-                    sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
-                    connected_clients_sockets = []
-                    connected_clients = []
-                    playerName_with_his_socket = {}
-                    # self.tcp_socket.close()
+                    answer = client_socket.recv(1024).decode().strip()
+                    if answer in TRIVIA_QUESTIONS[question]:
+                        self.winner = playerName_with_his_socket[client_socket]
+                except Exception as e:
+                    pass
 
-                finally:
-                    lock.release()
+            # Create a thread for each connected client to handle their answer
+            threads = []
+            for client_socket in connected_clients_sockets:
+                client_thread = threading.Thread(target=handle_client_answer, args=(client_socket, question))
+                client_thread.start()
+                threads.append(client_thread)
 
-            # for t in threads:
-            #     t.join()
-            time.sleep(10)
+            # Wait for all threads to finish or for the timeout
+            timeout_seconds = 10
+            start_time = time.time()
+            while time.time() - start_time < timeout_seconds and self.winner is None:
+                time.sleep(0.1)  # Reduce CPU usage while waiting for threads
 
-            #timer.cancel()
+            # If a winner is determined within the timeout period, break the loop
+            if self.winner:
+                self.winner = None
+                break
+
+            # Wait for a brief interval before proceeding to the next question
+            time.sleep(2)
+
+        # Game over: announce the winner
+        print(f"{self.winner} is correct! {self.winner} wins!")
+        sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
+
+        # Close connections and reset game state
+        self.GAME_OVER = True
+        self.Game_Started = "Finish"
+        sendallclients("Game over!", connected_clients_sockets)
+        sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
+        sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+
+        connected_clients_sockets = []
+        playerName_with_his_socket = {}
 
 
 
