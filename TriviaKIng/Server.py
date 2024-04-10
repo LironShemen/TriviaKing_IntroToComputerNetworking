@@ -237,6 +237,7 @@ class FoodTriviaServer:
                 while not self.winner:
                     try:
                         answer = client_socket.recv(1024).decode().strip()
+                        print(answer)
                         if answer in TRIVIA_QUESTIONS[question]:
                             with self.winner_lock:
                                 if self.winner is None:  # Check if winner is not already set
@@ -273,8 +274,11 @@ class FoodTriviaServer:
         # Close connections and reset game state
         self.GAME_OVER = True
         self.Game_Started = "Finish"
+        print("Game over!\n")
         sendallclients("Game over!\n", connected_clients_sockets)
+        print(f"Congratulations to the winner: {self.winner}\n")
         sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
+        print("Game over, sending out offer requests...\n")
         sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
         connected_clients_sockets = []
