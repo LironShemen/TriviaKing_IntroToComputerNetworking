@@ -134,6 +134,10 @@ class FoodTriviaServer:
 
 
     def run_game(self):
+        # Create an event to control the start of threads
+        start_event = threading.Event()
+        start_event.clear()  # Initially, event is not set
+
         self.winner = None
         self.winner_lock = threading.Lock()  # Lock for synchronizing access to self.winner
         global connected_clients_sockets, playerName_with_his_socket
@@ -155,6 +159,8 @@ class FoodTriviaServer:
 
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
+                # Wait for the start event to be set
+                start_event.wait()
                 #while self.winner is None:
                 while True:
                     try:
@@ -176,6 +182,8 @@ class FoodTriviaServer:
                 client_thread_run_the_game.daemon = True  # Set thread as daemon
                 client_thread_run_the_game.start()
                 threads_game_running.append(client_thread_run_the_game)
+            # Start all threads once the event is set
+            start_event.set()
 
             # Wait for all threads to finish or for the timeout
             timeout_seconds = 10
