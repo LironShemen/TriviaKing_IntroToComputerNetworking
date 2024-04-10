@@ -134,6 +134,7 @@ class FoodTriviaServer:
 
 
     def run_game(self):
+        list_of_socket_answers = []
         # Add a lock to synchronize access to the socket's recv() function
         recv_lock = threading.Lock()
         # Create an event to control the start of threads
@@ -160,6 +161,9 @@ class FoodTriviaServer:
 
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
+                answer = client_socket.recv(1024).decode().strip()
+                print(answer)
+                list_of_socket_answers.append((answer,client_socket))
                 # Wait for the start event to be set
                 #start_event.wait()
                 # While self.winner is None:
@@ -167,17 +171,16 @@ class FoodTriviaServer:
                     #try:
                         # Acquire the lock before reading from the socket
                         #with recv_lock:
-                    answer = client_socket.recv(1024).decode().strip()
-                    print(answer)
-                    if answer in TRIVIA_QUESTIONS[question]:
-                        with self.winner_lock:
-                            if self.winner is None:  # Check if winner is not already set
-                                self.winner = playerName_with_his_socket[client_socket]
+
+                    # print(answer)
+                    # if answer in TRIVIA_QUESTIONS[question]:
+                    #     with self.winner_lock:
+                    #         if self.winner is None:  # Check if winner is not already set
+                    #             self.winner = playerName_with_his_socket[client_socket]
                                 #break
                         #break
                    # except Exception as e:
                         #pass
-                    client_socket.shutdown(socket.SHUT_WR)
 
             # Create a thread for each connected client to handle their answer
             threads_game_running = []
@@ -193,6 +196,12 @@ class FoodTriviaServer:
             timeout_seconds = 10
             start_time = time.time()
             while time.time() - start_time < timeout_seconds and self.winner is None:
+                for tup in list_of_socket_answers:
+                    if tup[0] in TRIVIA_QUESTIONS[question]:
+                        self.winner = playerName_with_his_socket[tup[1]]
+                        break
+                    else:
+                        list_of_socket_answers.remove(tup)
                 time.sleep(0.1)  # Reduce CPU usage while waiting for threads
 
             # If a winner is determined within the timeout period, break the loop
