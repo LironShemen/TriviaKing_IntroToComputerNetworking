@@ -76,19 +76,19 @@ class TriviaGameClient:
         while True:
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
+                data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
                     break
                 decoded_data = data.decode()
                 if not decoded_data.startswith("Game over, sending out offer requests..."):
                     print(data.decode())
                 # Get input from the user
-                elif decoded_data.startswith("Game over, sending out offer requests..."):
+                if decoded_data.startswith("Game over, sending out offer requests..."):
                     print("Server disconnected, listening for offer requests...")
                     self.tcp_socket.close()
                     self.state = "looking_for_server"
                     self.listen_for_offers(self.udp_socket)
-                    break
-                elif decoded_data.startswith("Qusetion: "):
+                if decoded_data.startswith("Qusetion: "):
                     key = keyboard.read_event().name
                     print("\n")
                     # self.tcp_socket.send(key.encode(), self.player_name.encode())
@@ -100,6 +100,6 @@ class TriviaGameClient:
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":
-    player_name = "SapirTheChamp"  # Change this to your desired player name
+    player_name = "IsanaMtQueen"  # Change this to your desired player name
     client = TriviaGameClient(player_name)
     client.start()
