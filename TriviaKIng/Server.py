@@ -95,17 +95,12 @@ class FoodTriviaServer:
                     client_thread.daemon = True
                     client_thread.start()
                 except TimeoutError:
-                    # if(len(connected_clients)==1):
-                    #     print("Can't start game with only one player. Keep waiting for another player")
                         pass
-                    #print("Server manually stopped.")
-            # print("Game over, sending out offer requests...")
-            # sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
             self.tcp_socket.close()
             self.udp_thread.join()
-            self.udp_thread = threading.Thread(target=self.send_offer_message)
-            self.udp_thread.daemon = True
-            self.udp_thread.start()
+            # self.udp_thread = threading.Thread(target=self.send_offer_message)
+            # self.udp_thread.daemon = True
+            # self.udp_thread.start()
 
     def send_offer_message(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -217,10 +212,9 @@ class FoodTriviaServer:
         print("Game over, sending out offer requests...\n")
         sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
-        connected_clients_sockets = []
-        connected_clients = []
-        playerName_with_his_socket = {}
-
+        connected_clients_sockets.clear()
+        connected_clients.clear()
+        playerName_with_his_socket.clear()
 
 
     def time_out_handler(self):
@@ -237,45 +231,10 @@ class FoodTriviaServer:
                     self.Game_Started = "Yes"
                     self.udp_thread.join()
                     self.run_game()
+                    print("we got here")
         if self.Game_Started == "Finish":
             self.Game_Started = "No"
             threading.Thread(target=self.send_offer_message).start()
-
-    def time_out_handler_in_game(self):
-        self.Game_Started = True
-
-    def handle_client(self, client_socket, correct_answer):
-        global connected_clients_sockets
-        start_time = time.time()
-        player = playerName_with_his_socket[client_socket]
-        client_socket.settimeout(10)
-        try:
-            answer = self.receive_answer(client_socket,start_time)
-        except socket.timeout:
-            answer = None
-            pass
-
-        self.check_winner_dictionary[player] = [answer,time.time() - start_time]
-        if answer in correct_answer and client_socket in self.temp_socket_list:
-            self.winner = player
-            print(answer)
-            ###can add game statistics
-        if answer not in correct_answer:
-            self.temp_socket_list.remove(client_socket)
-
-
-    def receive_answer(self, client_socket, start_time):
-        answer=None
-        while (time.time()-start_time<10):
-            # Receive answer from client
-            answer = client_socket.recv(1024).decode().strip()
-            if answer:
-                return answer
-        if not answer:
-            return None
-
-
-
 
 # Two helper functions to deal with a situation when i want to listen to a
 # port that is already used by somebody else
