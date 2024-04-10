@@ -135,6 +135,7 @@ class FoodTriviaServer:
 
 
     def run_game(self):
+        global connected_clients
         QuestionBank = list(TRIVIA_QUESTIONS.keys())
         list_of_socket_answers = []
         # Create an event to control the start of threads
@@ -217,6 +218,7 @@ class FoodTriviaServer:
         sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
         connected_clients_sockets = []
+        connected_clients = []
         playerName_with_his_socket = {}
 
 

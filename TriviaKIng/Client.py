@@ -38,23 +38,26 @@ class TriviaGameClient:
     #Listens for offer requests from the server. It uses select to check if there is any
     # data available to read on the UDP socket. If an offer is received, it calls handle_offer method.
     def listen_for_offers(self, udp_socket):
+        data = None
         while True:
             print("Client started, listening for offer requests...")
+            try:
+                data, addr = udp_socket.recvfrom(self.buffer_size)
+            except:
+                pass
+            if not data == None:
+                tcp_port_bytes = data[37:]
+                tcp_port = int.from_bytes(tcp_port_bytes, 'big')
+                self.server_port = tcp_port
+                self.handle_offer(data[5:37].decode('utf-8'), addr[0])
 
-            data, addr = udp_socket.recvfrom(self.buffer_size)
+                if self.state == "connecting_to_server":
+                    self.connect_to_server()
+                    self.udp_socket.close()
 
-            tcp_port_bytes = data[37:]
-            tcp_port = int.from_bytes(tcp_port_bytes, 'big')
-            self.server_port = tcp_port
-            self.handle_offer(data[5:37].decode('utf-8'), addr[0])
+                if self.state == "game_mode":
+                    self.game_mode()
 
-            if self.state == "connecting_to_server":
-                self.connect_to_server()
-                self.udp_socket.close()
-
-            if self.state == "game_mode":
-                self.game_mode()
-                self.udp_socket = self.setup_udp_socket()
 
     #Handles the offer received from the server. It sets the server address and changes
     # the state to "connecting_to_server".
@@ -92,13 +95,18 @@ class TriviaGameClient:
                     print("Server disconnected, listening for offer requests...")
                     self.tcp_socket.close()
                     self.state = "looking_for_server"
+                    self.udp_socket = self.setup_udp_socket()
                     # self.listen_for_offers(self.udp_socket)
                 if decoded_data.startswith("Qusetion: "):
                     key = keyboard.read_event().name
                     print("\n")
                     self.tcp_socket.sendall(key.encode())
-            except:
-                pass
+            except socket.error as e:
+                #print(f"Socket error occurred: {e}")
+                self.tcp_socket.close()
+                self.state = "looking_for_server"
+                self.listen_for_offers(self.udp_socket)
+                break  # Exit the loop
 
 
 
