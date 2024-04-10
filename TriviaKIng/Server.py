@@ -161,22 +161,23 @@ class FoodTriviaServer:
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
                 # Wait for the start event to be set
-                start_event.wait()
+                #start_event.wait()
                 # While self.winner is None:
-                while True:
-                    try:
+                #while True:
+                    #try:
                         # Acquire the lock before reading from the socket
-                        with recv_lock:
-                            answer = client_socket.recv(1024).decode().strip()
-                            print(answer)
-                        if answer in TRIVIA_QUESTIONS[question]:
-                            with self.winner_lock:
-                                if self.winner is None:  # Check if winner is not already set
-                                    self.winner = playerName_with_his_socket[client_socket]
-                                    break
-                        break
-                    except Exception as e:
-                        pass
+                        #with recv_lock:
+                    answer = client_socket.recv(1024).decode().strip()
+                    print(answer)
+                    if answer in TRIVIA_QUESTIONS[question]:
+                        with self.winner_lock:
+                            if self.winner is None:  # Check if winner is not already set
+                                self.winner = playerName_with_his_socket[client_socket]
+                                #break
+                        #break
+                   # except Exception as e:
+                        #pass
+                    client_socket.shutdown(socket.SHUT_WR)
 
             # Create a thread for each connected client to handle their answer
             threads_game_running = []
