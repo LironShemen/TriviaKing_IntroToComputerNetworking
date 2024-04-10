@@ -98,20 +98,27 @@ class TriviaGameClient:
         #     except:
         #         pass
         while True:
+            try:
+                # List of sockets to check for input
+                sockets_list = [self.tcp_socket]
 
-            # maintains a list of possible input streams
-            sockets_list = [sys.stdin, self.tcp_socket]
+                # Use select to wait for input on sockets
+                read_sockets, _, _ = select.select(sockets_list, [], [])
 
-            read_sockets, write_socket, error_socket = select.select(sockets_list, [], [])
+                for socks in read_sockets:
+                    if socks == self.tcp_socket:
+                        # Receive data from the server
+                        message = socks.recv(2048)
+                        print(message.decode())  # Print received message
+                    else:
+                        # Read input from the keyboard
+                        message = sys.stdin.readline()
+                        self.tcp_socket.send(message.encode())  # Send input to the server
+                        sys.stdout.flush()
 
-            for socks in read_sockets:
-                if socks == self.tcp_socket:
-                    message = socks.recv(2048)
-                    print(message)
-                else:
-                    message = sys.stdin.readline()
-                    self.tcp_socket.send(message)
-                    sys.stdout.flush()
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                break
 
 
 
