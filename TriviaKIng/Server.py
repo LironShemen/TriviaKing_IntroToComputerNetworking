@@ -258,7 +258,6 @@ class FoodTriviaServer:
 
             # If a winner is determined within the timeout period, break the loop
             if self.winner:
-                self.winner = None
                 break
 
             # Wait for a brief interval before proceeding to the next question
@@ -266,14 +265,14 @@ class FoodTriviaServer:
 
         # Game over: announce the winner
         print(f"{self.winner} is correct! {self.winner} wins!")
-        sendallclients(f"{self.winner} is correct! {self.winner} wins!", connected_clients_sockets)
+        sendallclients(f"{self.winner} is correct! {self.winner} wins!\n", connected_clients_sockets)
 
         # Close connections and reset game state
         self.GAME_OVER = True
         self.Game_Started = "Finish"
-        sendallclients("Game over!", connected_clients_sockets)
-        sendallclients(f"Congratulations to the winner: {self.winner}", connected_clients_sockets)
-        sendallclients("Game over, sending out offer requests...", connected_clients_sockets)
+        sendallclients("Game over!\n", connected_clients_sockets)
+        sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
+        sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
         connected_clients_sockets = []
         playerName_with_his_socket = {}
