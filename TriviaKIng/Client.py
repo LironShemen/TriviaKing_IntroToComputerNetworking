@@ -74,51 +74,29 @@ class TriviaGameClient:
     # It uses select to wait for data on the TCP socket or user input from stdin.
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
-        # while True:
-        #     try:
-        #         data, _ = self.tcp_socket.recvfrom(self.buffer_size)
-        #         if not data:
-        #             continue
-        #         decoded_data = data.decode()
-        #         if not decoded_data.startswith("Game over, sending out offer requests..."):
-        #             print(data.decode())
-        #         # Get input from the user
-        #         if decoded_data.startswith("Game over, sending out offer requests..."):
-        #             print("Server disconnected, listening for offer requests...")
-        #             self.tcp_socket.close()
-        #             self.state = "looking_for_server"
-        #             self.listen_for_offers(self.udp_socket)
-        #         if decoded_data.startswith("Qusetion: "):
-        #             key = keyboard.read_event().name
-        #             print("\n")
-        #             if key.strip():  # Check if the answer is not empty (user input something)
-        #                 self.tcp_socket.sendall(key.encode())  # Send the answer to the server
-        #             else:  # If the user didn't input an answer
-        #                 self.tcp_socket.sendall(b"\n")
-        #     except:
-        #         pass
         while True:
             try:
-                # List of sockets to check for input
-                sockets_list = [self.tcp_socket]
-
-                # Use select to wait for input on sockets
-                read_sockets, _, _ = select.select(sockets_list, [], [])
-
-                for socks in read_sockets:
-                    if socks == self.tcp_socket:
-                        # Receive data from the server
-                        message = socks.recv(2048)
-                        print(message.decode())  # Print received message
-                    else:
-                        # Read input from the keyboard
-                        message = sys.stdin.readline()
-                        self.tcp_socket.send(message.encode())  # Send input to the server
-                        sys.stdout.flush()
-
-            except Exception as e:
-                print(f"Error occurred: {e}")
-                break
+                data, _ = self.tcp_socket.recvfrom(self.buffer_size)
+                if not data:
+                    continue
+                decoded_data = data.decode()
+                if not decoded_data.startswith("Game over, sending out offer requests..."):
+                    print(data.decode())
+                # Get input from the user
+                if decoded_data.startswith("Game over, sending out offer requests..."):
+                    print("Server disconnected, listening for offer requests...")
+                    self.tcp_socket.close()
+                    self.state = "looking_for_server"
+                    self.listen_for_offers(self.udp_socket)
+                if decoded_data.startswith("Qusetion: "):
+                    key = keyboard.read_event().name
+                    print("\n")
+                    if key.strip():  # Check if the answer is not empty (user input something)
+                        self.tcp_socket.sendall(key.encode())  # Send the answer to the server
+                    else:  # If the user didn't input an answer
+                        self.tcp_socket.sendall(b"\n")
+            except:
+                pass
 
 
 
