@@ -81,7 +81,7 @@ class FoodTriviaServer:
         self.TCP_PORT = find_available_port(self.TCP_PORT)
         self.tcp_socket.bind((self.MY_IP, self.TCP_PORT))
         self.tcp_socket.listen()
-        print("Server started, listening on IP address "+ f'{self.MY_IP}')
+        print("\033[1m"+ "\033[1;31m"+'\033[100m'+"Server started, listening on IP address "+ f'{self.MY_IP}')
         # timer_10sec_no_client = threading.Timer(10, self.time_out_handler)
         while True:
             while self.Game_Started=="No":
@@ -89,7 +89,7 @@ class FoodTriviaServer:
                     client_socket, address = self.tcp_socket.accept()
                     connected_clients_sockets.append(client_socket)
                     threading.Timer(10, self.time_out_handler).start()
-                    print(f"New connection from {address}")
+                    print("\033[1m"+"\033[1;35m"+f"New connection from {address}")
                     client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
                     self.clients_threads.append(client_thread)
                     client_thread.daemon = True
@@ -115,7 +115,8 @@ class FoodTriviaServer:
                 udp_socket.sendto(offer_message, ('<broadcast>', self.UDP_PORT))
                 # time.sleep(1)  # Adjust as needed to control the rate of message sending
             except Exception as e:
-                print("Error sending UDP offer message:", e)
+                pass
+                #print("Error sending UDP offer message:", e)
                 # Handle the error condition appropriately
         udp_socket.close()
 
@@ -140,11 +141,11 @@ class FoodTriviaServer:
         self.winner_lock = threading.Lock()  # Lock for synchronizing access to self.winner
         global connected_clients_sockets, playerName_with_his_socket
         welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
-        print(welcome)
+        print("\033[1m"+"\033[0;32m"+welcome)
         sendallclients(welcome, connected_clients_sockets)
 
         for idx, player in enumerate(connected_clients, start=1):
-            print(f"Player {idx}: {player}\n")
+            print("\033[1m"+"\033[1;31m"+f"Player {idx}: {player}\n")
             sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
 
         # Choose random trivia question
@@ -152,7 +153,7 @@ class FoodTriviaServer:
             question = random.choice(QuestionBank)
             QuestionBank.remove(question)
             print("\n==")
-            print(question)
+            print("\033[1m"+"\033[1;36m"+question)
             sendallclients("\n==\n", connected_clients_sockets)
             sendallclients(question + "\n", connected_clients_sockets)
 
@@ -205,11 +206,11 @@ class FoodTriviaServer:
         # Close connections and reset game state
         self.GAME_OVER = True
         self.Game_Started = "Finish"
-        print("Game over!\n")
+        print("\033[1m"+"\033[1;33m"+"Game over!\n")
         sendallclients("Game over!\n", connected_clients_sockets)
-        print(f"Congratulations to the winner: {self.winner}\n")
+        print("\033[1m"+"\033[1;32m"+f"Congratulations to the winner: {self.winner}\n")
         sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
-        print("Game over, sending out offer requests...\n")
+        print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
         sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
         connected_clients_sockets.clear()
@@ -221,7 +222,7 @@ class FoodTriviaServer:
         global connected_clients_sockets
         if(len(connected_clients) == 1):
             message = "Can't start game with only one player. Keep waiting for another player"
-            print(message)
+            print("\033[1m"+"\033[0;33m"+message)
             sendallclients(message, connected_clients_sockets)
         #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
         # If there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
@@ -231,7 +232,6 @@ class FoodTriviaServer:
                     self.Game_Started = "Yes"
                     self.udp_thread.join()
                     self.run_game()
-                    print("we got here")
         if self.Game_Started == "Finish":
             self.Game_Started = "No"
             threading.Thread(target=self.send_offer_message).start()
@@ -271,3 +271,30 @@ def sendallclients(data, clients_socket):
 if __name__ == "__main__":
     server = FoodTriviaServer()
     server.start()
+
+class bcolors:
+    """ ANSI color codes """
+    BLACK = "\033[0;30m"
+    RED = "\033[0;31m"
+    GREEN = "\033[0;32m"
+    BROWN = "\033[0;33m"
+    BLUE = "\033[0;34m"
+    PURPLE = "\033[0;35m"
+    CYAN = "\033[0;36m"
+    LIGHT_GRAY = "\033[0;37m"
+    DARK_GRAY = "\033[1;30m"
+    LIGHT_RED = "\033[1;31m"
+    LIGHT_GREEN = "\033[1;32m"
+    YELLOW = "\033[1;33m"
+    LIGHT_BLUE = "\033[1;34m"
+    LIGHT_PURPLE = "\033[1;35m"
+    LIGHT_CYAN = "\033[1;36m"
+    LIGHT_WHITE = "\033[1;37m"
+    BOLD = "\033[1m"
+    FAINT = "\033[2m"
+    ITALIC = "\033[3m"
+    UNDERLINE = "\033[4m"
+    BLINK = "\033[5m"
+    NEGATIVE = "\033[7m"
+    CROSSED = "\033[9m"
+    END = "\033[0m"
