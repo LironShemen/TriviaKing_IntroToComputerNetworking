@@ -89,16 +89,12 @@ class TriviaGameClient:
                     self.state = "looking_for_server"
                     self.listen_for_offers(self.udp_socket)
                 if decoded_data.startswith("Qusetion: "):
-                    # key = keyboard.read_event().name
-                    # print("\n")
-                    # self.tcp_socket.sendall(key.encode())
-                    start_time = time.time()
-                    while time.time() - start_time < 10:
-                        if keyboard.is_pressed():  # assuming you're using keyboard module
-                            key = keyboard.read_event().name
-                            print("\n")
-                            self.tcp_socket.sendall(key.encode())
-                            break
+                    key = keyboard.read_event().name
+                    print("\n")
+                    if key.strip():  # Check if the answer is not empty (user input something)
+                        self.tcp_socket.sendall(key.encode())  # Send the answer to the server
+                    else:  # If the user didn't input an answer
+                        self.tcp_socket.sendall(b"\n")
             except:
                 pass
 
