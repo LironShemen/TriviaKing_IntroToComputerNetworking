@@ -173,6 +173,7 @@ class FoodTriviaServer:
                 client_thread_run_the_game.daemon = True  # Set thread as daemon
                 client_thread_run_the_game.start()
                 threads_game_running.append(client_thread_run_the_game)
+                print(f"there are{len(threads_game_running)} threads running")
 
             # Wait for all threads to finish or for the timeout
             timeout_seconds = 10
