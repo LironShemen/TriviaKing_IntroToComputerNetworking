@@ -214,7 +214,15 @@ class FoodTriviaServer:
     #         #timer.cancel()
     def run_game(self):
         self.winner = None
+        self.winner_lock = threading.Lock()  # Lock for synchronizing access to self.winner
         global connected_clients_sockets, playerName_with_his_socket
+        welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
+        print(welcome)
+        sendallclients(welcome, connected_clients_sockets)
+
+        for idx, player in enumerate(connected_clients, start=1):
+            print(f"Player {idx}: {player}\n")
+            sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
 
         # Choose random trivia question
         while not self.winner:
@@ -229,7 +237,9 @@ class FoodTriviaServer:
                 try:
                     answer = client_socket.recv(1024).decode().strip()
                     if answer in TRIVIA_QUESTIONS[question]:
-                        self.winner = playerName_with_his_socket[client_socket]
+                        with self.winner_lock:
+                            if self.winner is None:  # Check if winner is not already set
+                                self.winner = playerName_with_his_socket[client_socket]
                 except Exception as e:
                     pass
 
