@@ -76,7 +76,8 @@ class TriviaGameClient:
         while True:
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
-                print(data.decode())
+                if not data.decode().startswith("Game over, sending out offer requests..."):
+                    print(data.decode())
                 # Get input from the user
                 if data.decode().startswith("Game over, sending out offer requests..."):
                     print("Server disconnected, listening for offer requests...")
