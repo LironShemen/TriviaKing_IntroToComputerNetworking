@@ -40,7 +40,7 @@ class TriviaGameClient:
     def listen_for_offers(self, udp_socket):
         data = None
         while True:
-            print("\033[1;37m"+"Client started, listening for offer requests...")
+            print("\033[1;36m"+'\033[100m'+"Client started, listening for offer requests...")
             try:
                 data, addr = udp_socket.recvfrom(self.buffer_size)
             except:
@@ -89,7 +89,7 @@ class TriviaGameClient:
                     continue
                 decoded_data = data.decode()
                 if not decoded_data.startswith("\033[1;31m"+"Game over, sending out offer requests..."):
-                    print(data.decode())
+                    print("\033[1;35m"+data.decode())
                 # Get input from the user
                 if decoded_data.startswith("\033[1;31m"+"Game over, sending out offer requests..."):
                     print("\033[0;31m"+"Server disconnected, listening for offer requests...")
