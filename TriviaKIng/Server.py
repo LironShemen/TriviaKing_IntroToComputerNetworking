@@ -263,6 +263,7 @@ class FoodTriviaServer:
 
             # Wait for a brief interval before proceeding to the next question
             time.sleep(2)
+        
 
         # Game over: announce the winner
         print(f"{self.winner} is correct! {self.winner} wins!")
