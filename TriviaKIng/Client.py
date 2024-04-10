@@ -1,3 +1,4 @@
+import msvcrt
 import socket
 import sys
 import time
@@ -5,6 +6,7 @@ import time
 import select
 import Server
 import keyboard
+import tkinter as tk
 
 class TriviaGameClient:
     #Initializes the client with a player name, server address,
@@ -89,10 +91,7 @@ class TriviaGameClient:
                     self.state = "looking_for_server"
                     self.listen_for_offers(self.udp_socket)
                 if decoded_data.startswith("Qusetion: "):
-                    event = keyboard.read_event()
-                    keyboard.press("enter")
-                    if event.event_type == keyboard.KEY_DOWN:
-                        key = event.name
+                    key = keyboard.read_event().name
                     print("\n")
                     self.tcp_socket.sendall(key.encode())
             except:
