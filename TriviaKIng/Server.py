@@ -247,6 +247,7 @@ class FoodTriviaServer:
             threads = []
             for client_socket in connected_clients_sockets:
                 client_thread = threading.Thread(target=handle_client_answer, args=(client_socket, question))
+                client_thread.daemon = True  # Set thread as daemon
                 client_thread.start()
                 threads.append(client_thread)
 
