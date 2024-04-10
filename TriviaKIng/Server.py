@@ -134,6 +134,7 @@ class FoodTriviaServer:
 
 
     def run_game(self):
+        QuestionBank = list(TRIVIA_QUESTIONS.keys())
         list_of_socket_answers = []
         # Create an event to control the start of threads
         start_event = threading.Event()
@@ -151,7 +152,8 @@ class FoodTriviaServer:
 
         # Choose random trivia question
         while not self.winner:
-            question = random.choice(list(TRIVIA_QUESTIONS.keys()))
+            question = random.choice(QuestionBank)
+            QuestionBank.remove(question)
             print("\n==")
             print(question)
             sendallclients("\n==\n", connected_clients_sockets)
