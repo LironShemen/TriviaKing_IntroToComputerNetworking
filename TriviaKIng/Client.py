@@ -76,7 +76,6 @@ class TriviaGameClient:
         while True:
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
-                data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
                     break
                 decoded_data = data.decode()
@@ -94,12 +93,12 @@ class TriviaGameClient:
                     # self.tcp_socket.send(key.encode(), self.player_name.encode())
                     self.tcp_socket.sendall(key.encode())
             except:
-                break
+                pass
 
 
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":
-    player_name = "IsanaMtQueen"  # Change this to your desired player name
+    player_name = "EyalTomato"  # Change this to your desired player name
     client = TriviaGameClient(player_name)
     client.start()

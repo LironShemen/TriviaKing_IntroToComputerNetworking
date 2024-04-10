@@ -155,7 +155,8 @@ class FoodTriviaServer:
 
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
-                while not self.winner:
+                #while self.winner is None:
+                while True:
                     try:
                         answer = client_socket.recv(1024).decode().strip()
                         print(answer)
@@ -163,6 +164,8 @@ class FoodTriviaServer:
                             with self.winner_lock:
                                 if self.winner is None:  # Check if winner is not already set
                                     self.winner = playerName_with_his_socket[client_socket]
+                                    break
+                        break
                     except Exception as e:
                         pass
 
