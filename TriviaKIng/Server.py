@@ -233,6 +233,7 @@ class FoodTriviaServer:
             with self.game_lock:
                 if self.Game_Started == "No":
                     self.Game_Started = "Yes"
+                    self.udp_thread.join()
                     self.run_game()
         elif self.Game_Started == "Finish":
             self.Game_Started = "No"
