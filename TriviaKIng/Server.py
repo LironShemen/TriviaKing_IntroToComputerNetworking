@@ -135,8 +135,6 @@ class FoodTriviaServer:
 
     def run_game(self):
         list_of_socket_answers = []
-        # Add a lock to synchronize access to the socket's recv() function
-        recv_lock = threading.Lock()
         # Create an event to control the start of threads
         start_event = threading.Event()
         start_event.clear()  # Initially, event is not set
@@ -161,26 +159,10 @@ class FoodTriviaServer:
 
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
+                start_event.wait()
                 answer = client_socket.recv(1024).decode().strip()
                 print(answer)
                 list_of_socket_answers.append((answer,client_socket))
-                # Wait for the start event to be set
-                #start_event.wait()
-                # While self.winner is None:
-                #while True:
-                    #try:
-                        # Acquire the lock before reading from the socket
-                        #with recv_lock:
-
-                    # print(answer)
-                    # if answer in TRIVIA_QUESTIONS[question]:
-                    #     with self.winner_lock:
-                    #         if self.winner is None:  # Check if winner is not already set
-                    #             self.winner = playerName_with_his_socket[client_socket]
-                                #break
-                        #break
-                   # except Exception as e:
-                        #pass
 
             # Create a thread for each connected client to handle their answer
             threads_game_running = []
@@ -189,6 +171,7 @@ class FoodTriviaServer:
                 client_thread_run_the_game.daemon = True  # Set thread as daemon
                 client_thread_run_the_game.start()
                 threads_game_running.append(client_thread_run_the_game)
+
             # Start all threads once the event is set
             start_event.set()
 
