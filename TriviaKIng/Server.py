@@ -92,6 +92,7 @@ class FoodTriviaServer:
                     print(f"New connection from {address}")
                     client_thread = threading.Thread(target=self.handle_tcp_client, args=(client_socket,))
                     self.clients_threads.append(client_thread)
+                    client_thread.daemon = True
                     client_thread.start()
                 except TimeoutError:
                     # if(len(connected_clients)==1):
