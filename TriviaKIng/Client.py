@@ -78,10 +78,6 @@ class TriviaGameClient:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
                     continue
-                if decoded_data.startswith("Qusetion: "):
-                    key = keyboard.read_event().name
-                    print("\n")
-                    self.tcp_socket.sendall(key.encode())
                 decoded_data = data.decode()
                 if not decoded_data.startswith("Game over, sending out offer requests..."):
                     print(data.decode())
@@ -91,6 +87,10 @@ class TriviaGameClient:
                     self.tcp_socket.close()
                     self.state = "looking_for_server"
                     self.listen_for_offers(self.udp_socket)
+                if decoded_data.startswith("Qusetion: "):
+                    key = keyboard.read_event().name
+                    print("\n")
+                    self.tcp_socket.sendall(key.encode())
             except:
                 pass
 
