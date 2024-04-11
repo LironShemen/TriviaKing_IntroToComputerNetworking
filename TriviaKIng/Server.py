@@ -98,9 +98,6 @@ class FoodTriviaServer:
                         pass
             self.tcp_socket.close()
             self.udp_thread.join()
-            # self.udp_thread = threading.Thread(target=self.send_offer_message)
-            # self.udp_thread.daemon = True
-            # self.udp_thread.start()
 
     def send_offer_message(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -116,15 +113,12 @@ class FoodTriviaServer:
                 # time.sleep(1)  # Adjust as needed to control the rate of message sending
             except Exception as e:
                 pass
-                #print("Error sending UDP offer message:", e)
-                # Handle the error condition appropriately
         udp_socket.close()
 
     def handle_tcp_client(self, client_socket):
         global connected_clients
         # Receive player name from client
         player_name = client_socket.recv(1024).decode().strip()
-        #print(f"Player connected: {player_name}")
         connected_clients.append(player_name)
         playerName_with_his_socket[client_socket] = player_name
         self.check_winner_dictionary[player_name] = [None,0]
@@ -220,10 +214,6 @@ class FoodTriviaServer:
             self.Game_Started = "Finish"
             print("\033[1m" + "\033[0;32m" + "Game over, sending out offer requests...\n")
 
-
-        # connected_clients_sockets.clear()
-        # connected_clients.clear()
-        # playerName_with_his_socket.clear()
 
 
     def time_out_handler(self):
