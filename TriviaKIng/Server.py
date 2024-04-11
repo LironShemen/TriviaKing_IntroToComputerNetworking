@@ -160,9 +160,12 @@ class FoodTriviaServer:
             # Function to handle each client's answer
             def handle_client_answer(client_socket, question):
                 start_event.wait()
-                answer = client_socket.recv(1024).decode().strip()
-                print(answer)
-                list_of_socket_answers.append((answer,client_socket))
+                try:
+                    answer = client_socket.recv(1024).decode().strip()
+                    print(answer)
+                    list_of_socket_answers.append((answer,client_socket))
+                except Exception as e:
+                    connected_clients_sockets.remove(client_socket)
 
             # Create a thread for each connected client to handle their answer
             threads_game_running = []
@@ -265,8 +268,12 @@ def get_my_ip():
         return None
 
 def sendallclients(data, clients_socket):
+    global connected_clients_sockets
     for client_socket in clients_socket:
-        client_socket.sendall(data.encode())
+        try:
+            client_socket.sendall(data.encode())
+        except Exception as e:
+            connected_clients_sockets.remove(client_socket)
 
 if __name__ == "__main__":
     server = FoodTriviaServer()
