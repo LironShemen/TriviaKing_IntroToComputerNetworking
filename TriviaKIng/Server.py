@@ -216,9 +216,9 @@ class FoodTriviaServer:
         print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
         sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
-        connected_clients_sockets.clear()
-        connected_clients.clear()
-        playerName_with_his_socket.clear()
+        # connected_clients_sockets.clear()
+        # connected_clients.clear()
+        # playerName_with_his_socket.clear()
 
 
     def time_out_handler(self):
@@ -236,6 +236,9 @@ class FoodTriviaServer:
                     self.udp_thread.join()
                     self.run_game()
         if self.Game_Started == "Finish":
+            connected_clients_sockets.clear()
+            connected_clients.clear()
+            playerName_with_his_socket.clear()
             self.Game_Started = "No"
             threading.Thread(target=self.send_offer_message).start()
 

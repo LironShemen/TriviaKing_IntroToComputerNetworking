@@ -120,6 +120,7 @@ class TriviaGameClient:
                     self.state = "looking_for_server"
                     self.udp_socket = self.setup_udp_socket()
                     self.listen_for_offers(self.udp_socket)
+                    break
                 if decoded_data.startswith("Qusetion: "):
                     key = keyboard.read_event().name
                     print("\n")
