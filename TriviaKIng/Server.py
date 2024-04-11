@@ -137,7 +137,7 @@ class FoodTriviaServer:
             sendallclients(question + "\n", connected_clients_sockets)
 
             # Function to handle each client's answer from each client's thread
-            def handle_client_answer(client_socket):
+            def handle_client_answer(client_socket, question):
                 start_event.wait()
                 try:
                     answer = client_socket.recv(1024).decode().strip()
@@ -150,7 +150,7 @@ class FoodTriviaServer:
             # Create a thread for each connected client to handle their answer
             threads_game_running = []
             for client_socket in connected_clients_sockets:
-                client_thread_run_the_game = threading.Thread(target=handle_client_answer, args=(client_socket))
+                client_thread_run_the_game = threading.Thread(target=handle_client_answer, args=(client_socket,question))
                 client_thread_run_the_game.daemon = True  # Set thread as daemon
                 client_thread_run_the_game.start()
                 threads_game_running.append(client_thread_run_the_game)
