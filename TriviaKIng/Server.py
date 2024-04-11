@@ -121,7 +121,8 @@ class FoodTriviaServer:
         player_name = client_socket.recv(1024).decode().strip()
         connected_clients.append(player_name)
         playerName_with_his_socket[client_socket] = player_name
-        self.check_winner_dictionary[player_name] = [None,0]
+        if not player_name in self.check_winner_dictionary:
+            self.check_winner_dictionary[player_name] = 0
 
 
     def run_game(self):
@@ -197,6 +198,7 @@ class FoodTriviaServer:
 
         if not self.winner==None:
             # Game over: announce the winner
+            self.check_winner_dictionary[self.winner]=+1
             print(f"{self.winner} is correct! {self.winner} wins!")
             sendallclients(f"{self.winner} is correct! {self.winner} wins!\n", connected_clients_sockets)
 
@@ -207,6 +209,10 @@ class FoodTriviaServer:
             sendallclients("Game over!\n", connected_clients_sockets)
             print("\033[1m"+"\033[1;32m"+f"Congratulations to the winner: {self.winner}\n")
             sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
+            print("\033[1m" + "\033[1;31m" + "\t\t\tWinners Table")
+            print("Player Name               | Player Score")
+            for player, score in self.check_winner_dictionary.items():
+                print(f"{player:<25} | {score}")
             print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
             sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
         else:
@@ -222,7 +228,6 @@ class FoodTriviaServer:
             message = "Can't start game with only one player. Keep waiting for another player"
             print("\033[1m"+"\033[0;33m"+message)
             sendallclients(message, connected_clients_sockets)
-        #connected_clients_sockets[0].sendall("Can't start game with only one player. Keep waiting for another player".encode())
         # If there are more than one client the game starts and we want to prevent the game will start over and over so we used a lock
         elif (len(connected_clients) > 1):
             with self.game_lock:

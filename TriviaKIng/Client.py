@@ -138,7 +138,7 @@ class TriviaGameClient:
 
 #creates an instance of TriviaGameClient, sets the player name, and starts the client.
 if __name__ == "__main__":
-    player_name = "SapirLetMeWin"  # Change this to your desired player name
+    player_name = "RoniTheBitch"  # Change this to your desired player name
     client = TriviaGameClient(player_name)
     client.start()
 
