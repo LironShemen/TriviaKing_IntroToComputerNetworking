@@ -105,6 +105,7 @@ class TriviaGameClient:
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
         while self.state == "game_mode":
+            print("")
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
@@ -128,6 +129,7 @@ class TriviaGameClient:
                 self.tcp_socket.close()
                 self.state = "looking_for_server"
                 print("\033[0;31m" + "Server disconnected, listening for offer requests...")
+                self.udp_socket = self.setup_udp_socket()
                 self.listen_for_offers(self.udp_socket)
                 break  # Exit the loop
 
