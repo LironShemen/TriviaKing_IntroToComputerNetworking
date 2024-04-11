@@ -11,26 +11,26 @@ import select
 
 # Trivia questions about food
 TRIVIA_QUESTIONS = {
-    "Qusetion: Carrots were originally purple": ['Y', 'T', '1'],
-    "Qusetion: Bananas are berries.": ['F', 'N', '0'],
-    "Qusetion: Peanuts are not nuts, they are legumes.": ['Y', 'T', '1'],
-    "Qusetion: Honey never spoils.": ['Y', 'T', '1'],
-    "Qusetion: Eating celery burns more calories than it contains.": ['F', 'N', '0'],
-    "Qusetion: Almonds are a member of the peach family.": ['F', 'N', '0'],
-    "Qusetion: Avocados are poisonous to birds.": ['Y', 'T', '1'],
-    "Qusetion: Rice contains more arsenic than other grains.": ['F', 'N', '0'],
-    "Qusetion: Apples float in water because they are 25% air": ['Y', 'T', '1'],
-    "Qusetion: Carrots improve night vision": ['F', 'N', '0'],
-    "Qusetion: Spinach is a good source of iron": ['Y', 'T', '1'],
-    "Qusetion: Chocolate causes acne": ['F', 'N', '0'],
-    "Qusetion: Garlic can help lower blood pressure": ['Y', 'T', '1'],
-    "Qusetion: Milk helps to create mucus": ['F', 'N', '0'],
-    "Qusetion: Pineapple can tenderize meat because it contains bromelain": ['Y', 'T', '1'],
-    "Qusetion: Coffee stunts your growth": ['F', 'N', '0'],
-    "Qusetion: Eating spicy food can boost metabolism": ['Y', 'T', '1'],
-    "Qusetion: Turkey makes you sleepy because it contains high levels of tryptophan": ['F', 'N', '0'],
-    "Qusetion: Coconut water is sterile and can be used as an emergency IV hydration fluid": ['Y', 'T', '1'],
-    "Qusetion: Eating cheese before bed gives you nightmares": ['F', 'N', '0']
+    "True Or False: Carrots were originally purple": ['Y', 'T', '1'],
+    "True Or False: Bananas are berries.": ['F', 'N', '0'],
+    "True Or False: Peanuts are not nuts, they are legumes.": ['Y', 'T', '1'],
+    "True Or False: Honey never spoils.": ['Y', 'T', '1'],
+    "True Or False: Eating celery burns more calories than it contains.": ['F', 'N', '0'],
+    "True Or False: Almonds are a member of the peach family.": ['F', 'N', '0'],
+    "True Or False: Avocados are poisonous to birds.": ['Y', 'T', '1'],
+    "True Or False: Rice contains more arsenic than other grains.": ['F', 'N', '0'],
+    "True Or False: Apples float in water because they are 25% air": ['Y', 'T', '1'],
+    "True Or False: Carrots improve night vision": ['F', 'N', '0'],
+    "True Or False: Spinach is a good source of iron": ['Y', 'T', '1'],
+    "True Or False: Chocolate causes acne": ['F', 'N', '0'],
+    "True Or False: Garlic can help lower blood pressure": ['Y', 'T', '1'],
+    "True Or False: Milk helps to create mucus": ['F', 'N', '0'],
+    "True Or False: Pineapple can tenderize meat because it contains bromelain": ['Y', 'T', '1'],
+    "True Or False: Coffee stunts your growth": ['F', 'N', '0'],
+    "True Or False: Eating spicy food can boost metabolism": ['Y', 'T', '1'],
+    "True Or False: Turkey makes you sleepy because it contains high levels of tryptophan": ['F', 'N', '0'],
+    "True Or False: Coconut water is sterile and can be used as an emergency IV hydration fluid": ['Y', 'T', '1'],
+    "True Or False: Eating cheese before bed gives you nightmares": ['F', 'N', '0']
 }
 
 # Mutex for thread synchronization
@@ -135,7 +135,7 @@ class FoodTriviaServer:
         self.winner = None
         self.winner_lock = threading.Lock()  # Lock for synchronizing access to self.winner
         global connected_clients_sockets, playerName_with_his_socket
-        welcome = "\n==\nWelcome to the -Sapir And Liron Magic Foodie Server #1-, where we are answering trivia questions about food.\n"
+        welcome = "\n==\nWelcome to the Sapir And Liron Magic Foodie Server #1, where we are answering trivia questions about food.\n"
         print("\033[1m"+"\033[0;32m"+welcome)
         sendallclients(welcome, connected_clients_sockets)
 
@@ -244,6 +244,7 @@ class FoodTriviaServer:
             connected_clients.clear()
             playerName_with_his_socket.clear()
             self.Game_Started = "No"
+            time.sleep(2)
             self.udp_thread.join(timeout=0)
             threading.Thread(target=self.send_offer_message).start()
 

@@ -100,7 +100,7 @@ class TriviaGameClient:
                     self.udp_socket = self.setup_udp_socket()
                     self.listen_for_offers(self.udp_socket)
                     break
-                if "Qusetion: " in decoded_data:
+                if "True Or False: " in decoded_data:
                     key = keyboard.read_event().name
                     print("\n")
                     self.tcp_socket.sendall(key.encode())
