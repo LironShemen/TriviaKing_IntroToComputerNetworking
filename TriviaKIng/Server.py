@@ -149,7 +149,7 @@ class FoodTriviaServer:
             sendallclients(f"Player {idx}: {player}\n", connected_clients_sockets)
 
         # Choose random trivia question
-        while not self.winner:
+        while not self.winner and len(connected_clients_sockets)>0:
             question = random.choice(QuestionBank)
             QuestionBank.remove(question)
             print("\n==")
@@ -201,20 +201,25 @@ class FoodTriviaServer:
             # Wait for a brief interval before proceeding to the next question
             time.sleep(2)
 
+        if not self.winner==None:
+            # Game over: announce the winner
+            print(f"{self.winner} is correct! {self.winner} wins!")
+            sendallclients(f"{self.winner} is correct! {self.winner} wins!\n", connected_clients_sockets)
 
-        # Game over: announce the winner
-        print(f"{self.winner} is correct! {self.winner} wins!")
-        sendallclients(f"{self.winner} is correct! {self.winner} wins!\n", connected_clients_sockets)
+            # Close connections and reset game state
+            self.GAME_OVER = True
+            self.Game_Started = "Finish"
+            print("\033[1m"+"\033[1;33m"+"Game over!\n")
+            sendallclients("Game over!\n", connected_clients_sockets)
+            print("\033[1m"+"\033[1;32m"+f"Congratulations to the winner: {self.winner}\n")
+            sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
+            print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
+            sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
+        else:
+            self.GAME_OVER = True
+            self.Game_Started = "Finish"
+            print("\033[1m" + "\033[0;32m" + "Game over, sending out offer requests...\n")
 
-        # Close connections and reset game state
-        self.GAME_OVER = True
-        self.Game_Started = "Finish"
-        print("\033[1m"+"\033[1;33m"+"Game over!\n")
-        sendallclients("Game over!\n", connected_clients_sockets)
-        print("\033[1m"+"\033[1;32m"+f"Congratulations to the winner: {self.winner}\n")
-        sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
-        print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
-        sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
 
         # connected_clients_sockets.clear()
         # connected_clients.clear()
