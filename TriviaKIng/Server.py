@@ -160,7 +160,8 @@ class FoodTriviaServer:
                     print(answer)
                     list_of_socket_answers.append((answer,client_socket))
                 except Exception as e:
-                    connected_clients_sockets.remove(client_socket)
+                    if client_socket in connected_clients_sockets:
+                        connected_clients_sockets.remove(client_socket)
 
             # Create a thread for each connected client to handle their answer
             threads_game_running = []
@@ -243,7 +244,7 @@ class FoodTriviaServer:
             connected_clients.clear()
             playerName_with_his_socket.clear()
             self.Game_Started = "No"
-            self.udp_thread.join()
+            self.udp_thread.join(timeout=0)
             threading.Thread(target=self.send_offer_message).start()
 
 # Two helper functions to deal with a situation when i want to listen to a
