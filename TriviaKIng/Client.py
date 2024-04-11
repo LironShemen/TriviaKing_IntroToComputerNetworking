@@ -9,7 +9,7 @@ import keyboard
 import tkinter as tk
 
 class TriviaGameClient:
-    #Initializes the client with a player name, server address,
+    # Initializes the client with a player name, server address,
     # TCP socket, and buffer size. Initially, the state of the client is set to "looking_for_server".
     def __init__(self, player_name):
         self.player_name = player_name
@@ -20,44 +20,24 @@ class TriviaGameClient:
         self.server_port = 13117
         self.udp_socket = None
 
-    #Starts the client by setting up a UDP socket and listening for offers from the server.
+    # Starts the client by setting up a UDP socket and listening for offers from the server.
     def start(self):
         self.udp_socket = self.setup_udp_socket()
         self.listen_for_offers(self.udp_socket)
 
-    #Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
+    # Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
     def setup_udp_socket(self):
-        # port = Server.find_available_port(12345)
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #Set SO_REUSEPORT option if available
+        # Set SO_REUSEPORT option if available
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udp_socket.bind(('', 13117))
         return udp_socket
 
 
-    #Listens for offer requests from the server. It uses select to check if there is any
+    # Listens for offer requests from the server. It uses select to check if there is any
     # data available to read on the UDP socket. If an offer is received, it calls handle_offer method.
     def listen_for_offers(self, udp_socket):
-        #
         data = None
-        # while True:
-        #     print("\033[1;36m"+'\033[100m'+"Client started, listening for offer requests...")
-        #     try:
-        #         data, addr = udp_socket.recvfrom(self.buffer_size)
-        #     except:
-        #         pass
-        #     if not data == None:
-        #         tcp_port_bytes = data[37:]
-        #         tcp_port = int.from_bytes(tcp_port_bytes, 'big')
-        #         self.server_port = tcp_port
-        #         self.handle_offer(data[5:37].decode('utf-8'), addr[0])
-        #
-        #         if self.state == "connecting_to_server":
-        #             self.connect_to_server()
-        #             self.udp_socket.close()
-        #
-        #         if self.state == "game_mode":
-        #             self.game_mode()
         while True:
             print("\033[1;36m"+'\033[100m'+"Client started, listening for offer requests...")
             while data is None:
@@ -81,14 +61,14 @@ class TriviaGameClient:
 
 
 
-    #Handles the offer received from the server. It sets the server address and changes
+    # Handles the offer received from the server. It sets the server address and changes
     # the state to "connecting_to_server".
     def handle_offer(self, server_name, server_address):
         self.state = "connecting_to_server"
         self.server_address = server_address
         print("\033[1m"+"\033[1;34m"+f"Received offer from server {server_name} at address {server_address}, attempting to connect...")
 
-    #Tries to connect to the server using TCP socket. If successful, it sends
+    # Tries to connect to the server using TCP socket. If successful, it sends
     # the player name to the server and changes the state to "game_mode".
     def connect_to_server(self):
         try:
@@ -105,7 +85,6 @@ class TriviaGameClient:
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
         while self.state == "game_mode":
-            #print("")
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
@@ -126,7 +105,6 @@ class TriviaGameClient:
                     print("\n")
                     self.tcp_socket.sendall(key.encode())
             except socket.error as e:
-                #print(f"Socket error occurred: {e}")
                 self.tcp_socket.close()
                 self.state = "looking_for_server"
                 print("\033[0;31m" + "Server disconnected, listening for offer requests...")
