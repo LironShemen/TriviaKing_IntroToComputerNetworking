@@ -141,7 +141,7 @@ class FoodTriviaServer:
                 start_event.wait()
                 try:
                     answer = client_socket.recv(1024).decode().strip()
-                    print(answer)
+                    # print(answer)######################################################
                     list_of_socket_answers.append((answer,client_socket)) # To check the correctness of the answer
                 except Exception as e: # In case a client will disconnect during the game
                     if client_socket in connected_clients_sockets:
