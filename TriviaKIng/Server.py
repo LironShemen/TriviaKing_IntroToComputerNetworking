@@ -208,9 +208,12 @@ class FoodTriviaServer:
             print("\033[1m"+"\033[1;32m"+f"Congratulations to the winner: {self.winner}\n")
             sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
             print("\033[1m" + "\033[1;31m" + "\t\t\tWinners Table")
+            sendallclients("\t\t\tWinners Table\n", connected_clients_sockets)
             print("Player Name               | Player Score")
+            sendallclients("Player Name               | Player Score\n", connected_clients_sockets)
             for player, score in self.check_winner_dictionary.items():
-                print(f"{player:<25} | {score}")
+                print(f"{player:<25} | {score}\n")
+                sendallclients(f"{player:<25} | {score}\n", connected_clients_sockets)
             print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
             sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
             # Close connections and reset game state

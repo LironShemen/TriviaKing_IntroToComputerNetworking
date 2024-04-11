@@ -1,12 +1,6 @@
-import msvcrt
 import socket
-import sys
-import time
-
-import select
-import Server
 import keyboard
-import tkinter as tk
+
 
 class TriviaGameClient:
     # Initializes the client with a player name, server address,
