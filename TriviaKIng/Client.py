@@ -90,16 +90,17 @@ class TriviaGameClient:
                 if not data:
                     continue
                 decoded_data = data.decode()
-                if not "Game over, sending out offer requests..." in decoded_data:
+                if not decoded_data.startswith("Game over, sending out offer requests..."):
                     print("\033[1;35m"+data.decode())
                 # Get input from the user
-                if "Game over, sending out offer requests..." in decoded_data:
-                    print("\033[0;31m"+"Server disconnected, listening for offer requests...")
+                if decoded_data.startswith("Game over, sending out offer requests..."):
                     self.tcp_socket.close()
-                    self.state = "looking_for_server"
-                    self.udp_socket = self.setup_udp_socket()
-                    self.listen_for_offers(self.udp_socket)
-                    break
+                    # print("\033[0;31m"+"Server disconnected, listening for offer requests...")
+                    # self.tcp_socket.close()
+                    # self.state = "looking_for_server"
+                    # self.udp_socket = self.setup_udp_socket()
+                    # self.listen_for_offers(self.udp_socket)
+                    # break
                 if "True Or False: " in decoded_data:
                     key = keyboard.read_event().name
                     print("\n")

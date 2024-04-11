@@ -203,22 +203,19 @@ class FoodTriviaServer:
             print(f"{self.winner} is correct! {self.winner} wins!")
             sendallclients(f"{self.winner} is correct! {self.winner} wins!\n", connected_clients_sockets)
 
-            # Close connections and reset game state
-            self.GAME_OVER = True
-            self.Game_Started = "Finish"
             print("\033[1m"+"\033[1;33m"+"Game over!\n")
             sendallclients("Game over!\n", connected_clients_sockets)
             print("\033[1m"+"\033[1;32m"+f"Congratulations to the winner: {self.winner}\n")
             sendallclients(f"Congratulations to the winner: {self.winner}\n", connected_clients_sockets)
             print("\033[1m" + "\033[1;31m" + "\t\t\tWinners Table")
-            sendallclients("\t\t\tWinners Table", connected_clients_sockets)
             print("Player Name               | Player Score")
-            sendallclients("Player Name               | Player Score", connected_clients_sockets)
             for player, score in self.check_winner_dictionary.items():
                 print(f"{player:<25} | {score}")
-                sendallclients(f"{player:<25} | {score}", connected_clients_sockets)
             print("\033[1m"+"\033[0;32m"+"Game over, sending out offer requests...\n")
             sendallclients("Game over, sending out offer requests...\n", connected_clients_sockets)
+            # Close connections and reset game state
+            self.GAME_OVER = True
+            self.Game_Started = "Finish"
         else:
             self.GAME_OVER = True
             self.Game_Started = "Finish"
@@ -244,7 +241,7 @@ class FoodTriviaServer:
             connected_clients.clear()
             playerName_with_his_socket.clear()
             self.Game_Started = "No"
-            time.sleep(2)
+            # time.sleep(2)
             self.udp_thread.join(timeout=0)
             threading.Thread(target=self.send_offer_message).start()
 
