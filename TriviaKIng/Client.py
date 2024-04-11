@@ -105,16 +105,16 @@ class TriviaGameClient:
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
         while self.state == "game_mode":
-            print("")
+            #print("")
             try:
                 data, _ = self.tcp_socket.recvfrom(self.buffer_size)
                 if not data:
                     continue
                 decoded_data = data.decode()
-                if not decoded_data.startswith("\033[1;31m"+"Game over, sending out offer requests..."):
+                if not decoded_data.startswith("Game over, sending out offer requests..."):
                     print("\033[1;35m"+data.decode())
                 # Get input from the user
-                if decoded_data.startswith("\033[1;31m"+"Game over, sending out offer requests..."):
+                if decoded_data.startswith("Game over, sending out offer requests..."):
                     print("\033[0;31m"+"Server disconnected, listening for offer requests...")
                     self.tcp_socket.close()
                     self.state = "looking_for_server"
