@@ -19,10 +19,10 @@ class TriviaGameClient:
         self.udp_socket = self.setup_udp_socket()
         self.listen_for_offers(self.udp_socket)
 
-    # Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 12345.
+    # Sets up a UDP socket for receiving offer requests. It binds the socket to localhost on port 13117.
     def setup_udp_socket(self):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Set SO_REUSEPORT option if available
+        # Set SO_REUSEPORT option
         udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udp_socket.bind(('', 13117))
         return udp_socket
@@ -40,13 +40,13 @@ class TriviaGameClient:
                 except Exception as e:
                     pass
 
-            tcp_port_bytes = data[37:]
-            tcp_port = int.from_bytes(tcp_port_bytes, 'big')
+            tcp_port_bytes = data[37:] # Take the tcp port from the offer message
+            tcp_port = int.from_bytes(tcp_port_bytes, 'big') # encode the tcp port
             self.server_port = tcp_port
-            self.handle_offer(data[5:37].decode('utf-8'), addr[0])
+            self.handle_offer(data[5:37].decode('utf-8'), addr[0]) # Activate handle_offer function, send the server's name and address
 
             if self.state == "connecting_to_server":
-                self.connect_to_server()
+                self.connect_to_server() # Connect to server via tcp
                 self.udp_socket.close()
 
             if self.state == "game_mode":
@@ -75,30 +75,31 @@ class TriviaGameClient:
             self.state = "looking_for_server"
 
     # Enters the game mode where it waits for inputs from the server or user.
-    # It uses select to wait for data on the TCP socket or user input from stdin.
+    # It uses recvfrom to wait for data on the TCP socket or user input from keyboard.
     # It sends user input to the server and prints messages received from the server.
     def game_mode(self):
         while self.state == "game_mode":
             try:
-                data, _ = self.tcp_socket.recvfrom(self.buffer_size)
+                data, _ = self.tcp_socket.recvfrom(self.buffer_size) #recive the data from the tcp socket
                 if not data:
                     continue
                 decoded_data = data.decode()
-                if not decoded_data.startswith("Game over, sending out offer requests..."):
+                if not decoded_data.startswith("Game over, sending out offer requests..."): # The game is on
                     print("\033[1;35m"+data.decode())
-                # Get input from the user
-                if "Game over, sending out offer requests..." in decoded_data:
+
+                if "Game over, sending out offer requests..." in decoded_data: # The game is ended, a winner is found
                     print("\033[0;31m"+"Server disconnected, listening for offer requests...")
                     self.tcp_socket.close()
                     self.state = "looking_for_server"
                     self.udp_socket = self.setup_udp_socket()
-                    self.listen_for_offers(self.udp_socket)
+                    self.listen_for_offers(self.udp_socket) # Back to listening for offers
                     break
-                if "True Or False: " in decoded_data:
-                    key = keyboard.read_event().name
+                if "True Or False: " in decoded_data: # If get a question from the server
+                    key = keyboard.read_event().name # Get input from user by keyboard press
                     print("\n")
                     self.tcp_socket.sendall(key.encode())
-            except socket.error as e:
+
+            except socket.error as e: # If the server disconnect
                 self.tcp_socket.close()
                 self.state = "looking_for_server"
                 print("\033[0;31m" + "Server disconnected, listening for offer requests...")
@@ -113,31 +114,3 @@ if __name__ == "__main__":
     player_name = "RoniTheBitch"  # Change this to your desired player name
     client = TriviaGameClient(player_name)
     client.start()
-
-
-class Colors:
-    """ ANSI color codes """
-    BLACK = "\033[0;30m"
-    RED = "\033[0;31m"
-    GREEN = "\033[0;32m"
-    BROWN = "\033[0;33m"
-    BLUE = "\033[0;34m"
-    PURPLE = "\033[0;35m"
-    CYAN = "\033[0;36m"
-    LIGHT_GRAY = "\033[0;37m"
-    DARK_GRAY = "\033[1;30m"
-    LIGHT_RED = "\033[1;31m"
-    LIGHT_GREEN = "\033[1;32m"
-    YELLOW = "\033[1;33m"
-    LIGHT_BLUE = "\033[1;34m"
-    LIGHT_PURPLE = "\033[1;35m"
-    LIGHT_CYAN = "\033[1;36m"
-    LIGHT_WHITE = "\033[1;37m"
-    BOLD = "\033[1m"
-    FAINT = "\033[2m"
-    ITALIC = "\033[3m"
-    UNDERLINE = "\033[4m"
-    BLINK = "\033[5m"
-    NEGATIVE = "\033[7m"
-    CROSSED = "\033[9m"
-    END = "\033[0m"
