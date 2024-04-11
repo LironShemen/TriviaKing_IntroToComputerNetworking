@@ -1,7 +1,9 @@
 # TriviaKing_IntroToComputerNetworking
 
-The is a client-server application that implements a trivia contest.
-Every ten seconds the server send to the players an intersting statement which is either true or false about food.
+This is a client-server application that implements a trivia contest.
+
+Every ten seconds the server sends to the players an intersting statement which is either true or false about food.
+
 The winner is the first one to answer correctly.
 
 
@@ -15,7 +17,7 @@ The winner is the first one to answer correctly.
 - We used both TCP and UDP protocols:
   - The server send brodcast offers using UDP connection for clients to join the game
   - The clients connect through the UDP connection
-  - After connection is maded they connect through a TCP connection ducring the whole game
+  - After connection is maded they connect through a TCP connection during the whole game
 
 
 ## Game Files:
