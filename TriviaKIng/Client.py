@@ -39,7 +39,7 @@ class TriviaGameClient:
     def listen_for_offers(self, udp_socket):
         data = None
         while True:
-            print("\033[1;36m"+'\033[100m'+"Client started, listening for offer requests...")
+            print("\033[1;36m"+'\033[100m'+"Client started, listening for offer requests..."+'\033[0m')
             while data is None:
                 try:
                     data, addr = udp_socket.recvfrom(self.buffer_size)
@@ -66,7 +66,7 @@ class TriviaGameClient:
     def handle_offer(self, server_name, server_address):
         self.state = "connecting_to_server"
         self.server_address = server_address
-        print("\033[1m"+"\033[1;34m"+f"Received offer from server {server_name} at address {server_address}, attempting to connect...")
+        print("\033[1m"+"\033[1;34m"+'\033[100m'+f"Received offer from server {server_name} at address {server_address}, attempting to connect..."+'\033[0m')
 
     # Tries to connect to the server using TCP socket. If successful, it sends
     # the player name to the server and changes the state to "game_mode".

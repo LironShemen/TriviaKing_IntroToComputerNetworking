@@ -198,7 +198,7 @@ class FoodTriviaServer:
 
         if not self.winner==None:
             # Game over: announce the winner
-            self.check_winner_dictionary[self.winner]=+1
+            self.check_winner_dictionary[self.winner]=self.check_winner_dictionary[self.winner]+1
             print(f"{self.winner} is correct! {self.winner} wins!")
             sendallclients(f"{self.winner} is correct! {self.winner} wins!\n", connected_clients_sockets)
 
@@ -240,6 +240,7 @@ class FoodTriviaServer:
             connected_clients.clear()
             playerName_with_his_socket.clear()
             self.Game_Started = "No"
+            self.udp_thread.join()
             threading.Thread(target=self.send_offer_message).start()
 
 # Two helper functions to deal with a situation when i want to listen to a
